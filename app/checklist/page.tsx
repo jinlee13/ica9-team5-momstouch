@@ -43,12 +43,12 @@ export default function ChecklistPage() {
   const skipCount = nowProducts.filter((p) => checklistState[p.id] === 'SKIP').length
   const noneCount = nowProducts.filter((p) => !checklistState[p.id]).length
 
-  const STATUS_TABS: { key: StatusFilter; label: string; count: number; color: string }[] = [
-    { key: 'ALL', label: '전체', count: nowProducts.length, color: 'bg-gray-100 text-gray-700' },
-    { key: 'NONE', label: '미체크', count: noneCount, color: 'bg-gray-50 text-gray-500' },
-    { key: 'BOUGHT', label: '구매완료', count: boughtCount, color: 'bg-green-50 text-green-700' },
-    { key: 'PENDING', label: '보류', count: pendingCount, color: 'bg-yellow-50 text-yellow-700' },
-    { key: 'SKIP', label: '생략', count: skipCount, color: 'bg-red-50 text-red-500' },
+  const STATUS_TABS: { key: StatusFilter; label: string; count: number }[] = [
+    { key: 'ALL', label: '전체', count: nowProducts.length },
+    { key: 'NONE', label: '미체크', count: noneCount },
+    { key: 'BOUGHT', label: '✅ 구매완료', count: boughtCount },
+    { key: 'PENDING', label: '⏳ 보류', count: pendingCount },
+    { key: 'SKIP', label: '🚫 생략', count: skipCount },
   ]
 
   const filtered = nowProducts.filter((p) => {
@@ -58,140 +58,145 @@ export default function ChecklistPage() {
   })
 
   return (
-    <div className="pb-24">
-      {/* Header */}
-      <div className="px-5 pt-8 pb-6"
-           style={{ background: 'linear-gradient(to bottom right, rgba(155,126,222,0.08), rgba(183,148,246,0.06))' }}>
-        <h1 className="text-2xl font-bold text-gray-900 mb-1">✅ 체크리스트</h1>
-        <p className="text-sm text-gray-500">{getAgeLabel(ageMonths)} · 지금 필요한 아이템 관리</p>
+    <div className="min-h-screen bg-gray-50">
+      {/* GNB */}
+      <nav className="border-b border-gray-100 bg-white sticky top-0 z-50 shadow-sm">
+        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+          <Link href="/" className="text-xl font-bold" style={{ color: '#9B7EDE' }}>똑똑한 엄마</Link>
+          <div className="flex items-center gap-4">
+            <Link href="/home" className="text-sm text-gray-500 hover:text-purple-600 transition-colors">← 홈으로</Link>
+          </div>
+        </div>
+      </nav>
+
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-black text-gray-900 mb-1">✅ 체크리스트</h1>
+          <p className="text-gray-500">{getAgeLabel(ageMonths)} · 지금 필요한 아이템 구매 현황</p>
+        </div>
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          {[
+            { label: '전체', count: nowProducts.length, color: 'text-gray-700', bg: 'bg-white' },
+            { label: '구매완료', count: boughtCount, color: 'text-green-600', bg: 'bg-green-50' },
+            { label: '보류 중', count: pendingCount, color: 'text-yellow-600', bg: 'bg-yellow-50' },
+            { label: '생략', count: skipCount, color: 'text-red-400', bg: 'bg-red-50' },
+          ].map((stat) => (
+            <div key={stat.label} className={`${stat.bg} rounded-2xl p-5 border-2 border-gray-100 text-center`}>
+              <div className={`text-4xl font-black ${stat.color} mb-1`}>{stat.count}</div>
+              <div className="text-sm text-gray-500">{stat.label}</div>
+            </div>
+          ))}
+        </div>
 
         {/* Progress */}
-        <div className="mt-4 bg-white rounded-2xl p-4 shadow-sm border border-purple-100">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-semibold text-gray-700">이번 달 필수템 완료율</span>
-            <span className="text-sm font-bold" style={{ color: '#9B7EDE' }}>
+        <div className="bg-white rounded-2xl p-6 border-2 border-gray-100 shadow-sm mb-8">
+          <div className="flex items-center justify-between mb-3">
+            <span className="font-bold text-gray-700">이번 달 완료율</span>
+            <span className="text-xl font-black" style={{ color: '#9B7EDE' }}>
               {nowProducts.length > 0 ? Math.round((boughtCount / nowProducts.length) * 100) : 0}%
             </span>
           </div>
-          <div className="w-full bg-gray-100 rounded-full h-3">
-            <div className="h-3 rounded-full transition-all duration-500"
+          <div className="w-full bg-gray-100 rounded-full h-4">
+            <div className="h-4 rounded-full transition-all duration-700"
                  style={{
                    width: nowProducts.length > 0 ? `${(boughtCount / nowProducts.length) * 100}%` : '0%',
                    background: 'linear-gradient(to right, #9B7EDE, #B794F6)'
                  }} />
           </div>
-          <div className="flex justify-between mt-3">
-            {[
-              { label: '구매완료', count: boughtCount, color: 'text-green-600' },
-              { label: '보류', count: pendingCount, color: 'text-yellow-600' },
-              { label: '생략', count: skipCount, color: 'text-red-400' },
-              { label: '미체크', count: noneCount, color: 'text-gray-400' },
-            ].map((stat) => (
-              <div key={stat.label} className="text-center">
-                <div className={`text-lg font-bold ${stat.color}`}>{stat.count}</div>
-                <div className="text-xs text-gray-400">{stat.label}</div>
-              </div>
-            ))}
-          </div>
         </div>
-      </div>
 
-      {/* Status Filter */}
-      <div className="px-5 py-3 overflow-x-auto border-b border-gray-100">
-        <div className="flex gap-2 w-max">
+        {/* Filter Tabs */}
+        <div className="flex flex-wrap gap-2 mb-6">
           {STATUS_TABS.map((tab) => {
             const isActive = statusFilter === tab.key
             return (
               <button
                 key={tab.key}
                 onClick={() => setStatusFilter(tab.key)}
-                className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
-                  isActive ? 'text-white shadow-md' : `${tab.color} hover:opacity-80`
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all border-2 ${
+                  isActive ? 'text-white border-transparent shadow-md' : 'bg-white text-gray-600 border-gray-200 hover:border-purple-300'
                 }`}
                 style={isActive ? { background: 'linear-gradient(to right, #9B7EDE, #B794F6)' } : {}}>
                 {tab.label}
-                <span className={`text-xs px-1.5 py-0.5 rounded-full ${isActive ? 'bg-white/20 text-white' : 'bg-white text-gray-500'}`}>
+                <span className={`text-xs px-1.5 py-0.5 rounded-full font-bold ${isActive ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500'}`}>
                   {tab.count}
                 </span>
               </button>
             )
           })}
         </div>
-      </div>
 
-      {/* List */}
-      <div className="px-5 py-4 space-y-3">
+        {/* Product Grid */}
         {filtered.length === 0 ? (
-          <div className="text-center py-12 text-gray-400">
-            <div className="text-4xl mb-3">📋</div>
-            <p className="font-medium">해당하는 아이템이 없어요</p>
+          <div className="bg-white rounded-3xl p-16 text-center border-2 border-gray-100">
+            <div className="text-5xl mb-4">📋</div>
+            <p className="text-gray-500 font-medium text-lg">해당하는 아이템이 없어요</p>
           </div>
         ) : (
-          filtered.map((product) => {
-            const status = checklistState[product.id] ?? ''
-            const necessity = NECESSITY_LABELS[product.necessity]
-            const category = CATEGORY_INFO[product.categorySlug]
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {filtered.map((product) => {
+              const status = checklistState[product.id] ?? ''
+              const necessity = NECESSITY_LABELS[product.necessity]
+              const category = CATEGORY_INFO[product.categorySlug]
 
-            return (
-              <div key={product.id}
-                   className={`bg-white rounded-2xl p-4 border-2 shadow-sm transition-all ${
-                     status === 'BOUGHT' ? 'border-green-200' : 'border-gray-100'
-                   }`}>
-                <div className="flex items-start gap-3">
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0 ${category?.color ?? 'bg-gray-50'}`}>
-                    {category?.icon}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-0.5">
-                      <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${necessity?.bg} ${necessity?.color}`}>
-                        {necessity?.label}
-                      </span>
+              return (
+                <div key={product.id}
+                     className={`bg-white rounded-2xl border-2 shadow-sm transition-all flex flex-col overflow-hidden ${
+                       status === 'BOUGHT' ? 'border-green-200 opacity-80' : 'border-gray-100'
+                     }`}>
+                  <div className="p-5 flex-1">
+                    <div className="flex items-start gap-3 mb-3">
+                      <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-xl flex-shrink-0 ${category?.color ?? 'bg-gray-50'}`}>
+                        {category?.icon}
+                      </div>
+                      <div className="flex-1">
+                        <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${necessity?.bg} ${necessity?.color}`}>
+                          {necessity?.label}
+                        </span>
+                        <Link href={`/products/${product.id}`}
+                              className={`block mt-1 font-bold text-sm hover:text-purple-600 transition-colors leading-snug ${
+                                status === 'BOUGHT' ? 'line-through text-gray-400' : 'text-gray-800'
+                              }`}>
+                          {product.name}
+                        </Link>
+                        <p className="text-xs text-gray-400 mt-0.5">{product.priceRange}</p>
+                      </div>
                     </div>
-                    <Link href={`/products/${product.id}`}
-                          className={`font-semibold text-sm hover:text-purple-600 transition-colors ${
-                            status === 'BOUGHT' ? 'line-through text-gray-400' : 'text-gray-800'
+                  </div>
+                  <div className="border-t border-gray-50 px-5 py-4">
+                    <div className="flex gap-2">
+                      {[
+                        { key: 'BOUGHT', label: '✅ 완료', active: 'bg-green-100 text-green-700 border-green-300' },
+                        { key: 'PENDING', label: '⏳ 보류', active: 'bg-yellow-100 text-yellow-700 border-yellow-300' },
+                        { key: 'SKIP', label: '🚫 생략', active: 'bg-red-50 text-red-500 border-red-200' },
+                      ].map((btn) => (
+                        <button
+                          key={btn.key}
+                          onClick={() => updateStatus(product.id, status === btn.key ? '' : btn.key)}
+                          className={`flex-1 py-2 rounded-xl text-xs font-bold border-2 transition-all ${
+                            status === btn.key ? btn.active : 'bg-gray-50 text-gray-400 border-gray-100 hover:border-gray-300'
                           }`}>
-                      {product.name}
-                    </Link>
-                    <p className="text-xs text-gray-400 mt-0.5">{product.priceRange}</p>
+                          {btn.label}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
-                <div className="flex gap-2 mt-3">
-                  {[
-                    { key: 'BOUGHT', label: '✅', tooltip: '구매완료', active: 'bg-green-100 text-green-700 border-green-300' },
-                    { key: 'PENDING', label: '⏳', tooltip: '보류', active: 'bg-yellow-100 text-yellow-700 border-yellow-300' },
-                    { key: 'SKIP', label: '🚫', tooltip: '생략', active: 'bg-red-50 text-red-500 border-red-200' },
-                  ].map((btn) => (
-                    <button
-                      key={btn.key}
-                      onClick={() => updateStatus(product.id, status === btn.key ? '' : btn.key)}
-                      className={`flex-1 py-2 rounded-xl text-sm font-semibold border-2 transition-all ${
-                        status === btn.key ? btn.active : 'bg-gray-50 text-gray-400 border-gray-100 hover:border-gray-300'
-                      }`}
-                      title={btn.tooltip}>
-                      {btn.label} {btn.tooltip}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )
-          })
+              )
+            })}
+          </div>
         )}
       </div>
 
-      {/* Bottom Nav */}
-      <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-white border-t border-gray-200 px-6 py-3 flex justify-around z-50">
-        {[
-          { href: '/home', icon: '🏠', label: '홈', key: 'home' },
-          { href: '/checklist', icon: '✅', label: '체크리스트', key: 'checklist' },
-        ].map((nav) => (
-          <Link key={nav.key} href={nav.href}
-                className={`flex flex-col items-center gap-1 ${nav.key === 'checklist' ? 'text-purple-600' : 'text-gray-400'}`}>
-            <span className="text-xl">{nav.icon}</span>
-            <span className="text-xs font-medium">{nav.label}</span>
-          </Link>
-        ))}
-      </div>
+      <footer className="mt-16 bg-white border-t border-gray-100 py-8">
+        <div className="max-w-7xl mx-auto px-6 flex items-center justify-between text-sm text-gray-400">
+          <Link href="/" className="font-bold text-purple-500">똑똑한 엄마</Link>
+          <p>이 정보는 참고용이며 의료적 조언이 아닙니다.</p>
+        </div>
+      </footer>
     </div>
   )
 }
