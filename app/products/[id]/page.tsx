@@ -11,6 +11,7 @@ import {
   NECESSITY_LABELS,
   CATEGORY_INFO,
   DDOK_PILLAR_LABELS,
+  type TopProduct,
 } from '@/lib/recommendations'
 
 export default function ProductDetailPage({ params }: { params: { id: string } }) {
@@ -108,6 +109,37 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
                 <p className="text-gray-700 leading-relaxed">{product.reason}</p>
               </div>
             </div>
+
+            {/* Top Products from 안혜린 데이터 */}
+            {product.topProducts && product.topProducts.length > 0 && (
+              <div className="bg-white rounded-3xl p-7 border-2 border-yellow-100 shadow-sm">
+                <h2 className="text-lg font-bold text-gray-800 mb-1 flex items-center gap-2">
+                  <span className="text-2xl">🛒</span> 실제 인기 제품
+                </h2>
+                <p className="text-xs text-gray-400 mb-4">네이버쇼핑·쿠팡 실제 판매 데이터 기반</p>
+                <div className="space-y-3">
+                  {product.topProducts.map((tp: TopProduct, i: number) => (
+                    <div key={i} className="flex items-center gap-4 p-3 rounded-2xl bg-amber-50 border border-amber-100">
+                      <div className="w-8 h-8 rounded-full bg-amber-200 text-amber-700 font-black text-sm flex items-center justify-center flex-shrink-0">
+                        {i + 1}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-gray-800 leading-snug">{tp.name}</p>
+                        <div className="flex items-center gap-3 mt-0.5">
+                          <span className="text-sm font-bold text-amber-700">{tp.price}</span>
+                          {tp.rating && (
+                            <span className="text-xs text-gray-500">⭐ {tp.rating} · 리뷰 {tp.reviews.toLocaleString()}개</span>
+                          )}
+                          {!tp.rating && (
+                            <span className="text-xs text-gray-500">리뷰 {tp.reviews.toLocaleString()}개</span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* DDOK Theory */}
             {ddok && (

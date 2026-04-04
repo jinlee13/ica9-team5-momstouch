@@ -187,17 +187,12 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-4 gap-6">
             {[
               { icon: '🛏️', name: '자기·위생', items: '수면, 위생, 목욕', color: 'from-indigo-50 to-indigo-100', badge: 'border-indigo-200' },
-              { icon: '🍼', name: '먹기', items: '수유, 이유식, 식기', color: 'from-yellow-50 to-amber-100', badge: 'border-yellow-200', soon: true },
+              { icon: '🍼', name: '먹기', items: '수유, 이유식, 식기', color: 'from-yellow-50 to-amber-100', badge: 'border-yellow-200' },
               { icon: '🧸', name: '놀기·배우기', items: '발달교구, 놀이완구', color: 'from-pink-50 to-pink-100', badge: 'border-pink-200' },
               { icon: '🚗', name: '외출·안전', items: '외출용품, 안전용품', color: 'from-green-50 to-emerald-100', badge: 'border-green-200' },
             ].map((cat) => (
               <div key={cat.name}
                    className={`p-7 rounded-3xl bg-gradient-to-br ${cat.color} border-2 ${cat.badge} hover:shadow-xl transition-all duration-300 hover:-translate-y-1 relative`}>
-                {cat.soon && (
-                  <span className="absolute top-4 right-4 text-xs px-2 py-1 rounded-full bg-yellow-200 text-yellow-700 font-semibold">
-                    데이터 준비중
-                  </span>
-                )}
                 <div className="text-5xl mb-4">{cat.icon}</div>
                 <h3 className="text-xl font-bold text-gray-900 mb-1">{cat.name}</h3>
                 <p className="text-sm text-gray-500">{cat.items}</p>

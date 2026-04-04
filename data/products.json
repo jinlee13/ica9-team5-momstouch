@@ -60,13 +60,17 @@
       "ageMinMonths": 0,
       "ageMaxMonths": 1,
       "necessity": "ESSENTIAL",
-      "reason": "모유·분유 수유 모두에 필요한 기본 수유 도구입니다.",
+      "reason": "모유·분유 수유 모두에 필요한 기본 수유 도구입니다. 신생아는 하루 8~12회 수유가 필요해 소독기는 필수입니다.",
       "developStage": "반사운동기",
-      "priceRange": "30,000~150,000원",
+      "priceRange": "12,000~150,000원",
       "kcCertified": true,
       "coupangUrl": null,
       "ddokPillars": ["K"],
-      "theoryNote": "에릭슨 신뢰감 형성: 일관된 수유가 최초의 신뢰 경험입니다."
+      "theoryNote": "에릭슨 신뢰감 형성: 일관된 수유가 최초의 신뢰 경험입니다.",
+      "topProducts": [
+        { "name": "유아용 젖병 (BPA-free 유리)", "price": "12,000~15,000원", "rating": 4.5, "reviews": 250 },
+        { "name": "아기 젖병 (PPSU 소재)", "price": "15,000~25,000원", "rating": 4.5, "reviews": 50 }
+      ]
     },
     {
       "id": "0-1m-feeding-2",
@@ -474,7 +478,11 @@
       "kcCertified": false,
       "coupangUrl": null,
       "ddokPillars": ["T"],
-      "theoryNote": "AAP: 입술 다물기 = 이유식 시작 신호. 준비물을 미리 갖춰두세요."
+      "theoryNote": "AAP: 입술 다물기 = 이유식 시작 신호. 준비물을 미리 갖춰두세요.",
+      "topProducts": [
+        { "name": "파파루 간편레시피 유기농 쌀가루 백미 초기", "price": "7,300원", "rating": 4.8, "reviews": 5125 },
+        { "name": "퍼기 유기농 이유식 쌀가루 가루입자 초기", "price": "10,000원", "rating": 4.5, "reviews": 2952 }
+      ]
     },
     {
       "id": "3-6m-feeding-2",
@@ -678,7 +686,11 @@
       "kcCertified": false,
       "coupangUrl": null,
       "ddokPillars": ["T"],
-      "theoryNote": "6개월부터 중기 이유식으로 다양한 식재료 도입이 권장됩니다."
+      "theoryNote": "6개월부터 중기 이유식으로 다양한 식재료 도입이 권장됩니다.",
+      "topProducts": [
+        { "name": "아기 이유식 조리기 (찌기+갈기+보관)", "price": "70,000원", "rating": 4.9, "reviews": 50 },
+        { "name": "이유식 중기 흡착 그릇 세트", "price": "15,000원", "rating": null, "reviews": 167 }
+      ]
     },
     {
       "id": "6-12m-feeding-2",
@@ -691,11 +703,15 @@
       "necessity": "ESSENTIAL",
       "reason": "젖병 떼기 연습. 자기 힘으로 마시는 독립 훈련을 시작합니다.",
       "developStage": "자기 주도 식사 준비",
-      "priceRange": "15,000~40,000원",
+      "priceRange": "12,000~17,000원",
       "kcCertified": false,
       "coupangUrl": null,
       "ddokPillars": ["D"],
-      "theoryNote": "K-DST 소근육: 집게 쥐기(Pincer grip)가 시작되는 시기입니다."
+      "theoryNote": "K-DST 소근육: 집게 쥐기(Pincer grip)가 시작되는 시기입니다.",
+      "topProducts": [
+        { "name": "에디슨 스스로 실리콘 양손 빨대컵 200ml", "price": "12,340원", "rating": 4.5, "reviews": 6712 },
+        { "name": "베베픽 유아용 원터치 PPSU 빨대컵 250ml", "price": "16,800원", "rating": 4.5, "reviews": 272 }
+      ]
     },
     {
       "id": "6-12m-feeding-3",
@@ -712,7 +728,10 @@
       "kcCertified": false,
       "coupangUrl": null,
       "ddokPillars": ["D", "O"],
-      "theoryNote": "아이 주도 이유식(BLW)을 진행하는 경우 특히 유용합니다."
+      "theoryNote": "아이 주도 이유식(BLW)을 진행하는 경우 특히 유용합니다.",
+      "topProducts": [
+        { "name": "안전한 유아 식기 세트 (흡착 그릇)", "price": "15,000원", "rating": 4.5, "reviews": 120 }
+      ]
     },
     {
       "id": "6-12m-outdoor-1",
@@ -878,11 +897,14 @@
       "necessity": "ESSENTIAL",
       "reason": "자기 주도 식사 훈련. 뒤집어지지 않는 흡착판 그릇이 필수입니다.",
       "developStage": "자기 주도 식사",
-      "priceRange": "30,000~80,000원",
+      "priceRange": "22,000~30,000원",
       "kcCertified": false,
       "coupangUrl": null,
       "ddokPillars": ["D", "K"],
-      "theoryNote": "에릭슨 자율성: '내가 할 거야'를 격려하는 환경이 중요합니다."
+      "theoryNote": "에릭슨 자율성: '내가 할 거야'를 격려하는 환경이 중요합니다.",
+      "topProducts": [
+        { "name": "유아용 스테인리스 식기 세트 (흡착)", "price": "22,000원", "rating": 4.8, "reviews": 85 }
+      ]
     },
     {
       "id": "12-24m-feeding-2",
@@ -899,7 +921,10 @@
       "kcCertified": false,
       "coupangUrl": null,
       "ddokPillars": ["D"],
-      "theoryNote": "피아제 전조작기: 상징 놀이와 모방이 시작되는 시기입니다."
+      "theoryNote": "피아제 전조작기: 상징 놀이와 모방이 시작되는 시기입니다.",
+      "topProducts": [
+        { "name": "유아용 스테인리스 빨대 (안전형)", "price": "19,900원", "rating": 4.8, "reviews": 80 }
+      ]
     },
     {
       "id": "12-24m-feeding-3",
@@ -912,11 +937,15 @@
       "necessity": "ESSENTIAL",
       "reason": "젖병을 완전히 졸업하고 빨대 음용 습관으로 전환합니다.",
       "developStage": "젖병 졸업",
-      "priceRange": "15,000~40,000원",
+      "priceRange": "11,000~17,000원",
       "kcCertified": false,
       "coupangUrl": null,
       "ddokPillars": ["D"],
-      "theoryNote": "AAP: 12개월부터 젖병 졸업을 권장합니다."
+      "theoryNote": "AAP: 12개월부터 젖병 졸업을 권장합니다.",
+      "topProducts": [
+        { "name": "그로미미 PPSU 빨대컵", "price": "16,370원", "rating": 5.0, "reviews": 12321 },
+        { "name": "기용니 아기 빨대컵", "price": "11,150원", "rating": 5.0, "reviews": 100 }
+      ]
     },
     {
       "id": "12-24m-outdoor-1",
@@ -1268,9 +1297,7 @@
       "slug": "feeding",
       "name": "먹기",
       "icon": "🍼",
-      "description": "수유, 이유식, 식기 용품",
-      "empty": true,
-      "emptyMessage": "먹기 카테고리 데이터를 준비 중입니다."
+      "description": "수유, 이유식, 식기 용품"
     },
     "play": {
       "slug": "play",

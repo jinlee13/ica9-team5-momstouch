@@ -1,5 +1,12 @@
 import productsData from '@/data/products.json'
 
+export interface TopProduct {
+  name: string
+  price: string
+  rating: number | null
+  reviews: number
+}
+
 export interface Product {
   id: string
   name: string
@@ -16,6 +23,7 @@ export interface Product {
   coupangUrl: string | null
   ddokPillars: string[]
   theoryNote: string
+  topProducts?: TopProduct[]
 }
 
 export type Priority = 'NOW' | 'SOON' | 'LATER'
