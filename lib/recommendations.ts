@@ -20,7 +20,6 @@ export interface Product {
   developStage: string
   priceRange: string
   kcCertified: boolean
-  coupangUrl: string | null
   ddokPillars: string[]
   theoryNote: string
   topProducts?: TopProduct[]

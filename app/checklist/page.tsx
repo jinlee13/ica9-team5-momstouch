@@ -32,7 +32,9 @@ export default function ChecklistPage() {
   }, [router])
 
   function updateStatus(id: string, status: string) {
-    const next = { ...checklistState, [id]: status }
+    const next = { ...checklistState }
+    if (status) next[id] = status
+    else delete next[id]
     setChecklistState(next)
     localStorage.setItem('ddokddok_checklist', JSON.stringify(next))
   }

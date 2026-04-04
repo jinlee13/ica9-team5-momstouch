@@ -27,8 +27,9 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
 
   function updateStatus(newStatus: string) {
     const cl = localStorage.getItem('ddokddok_checklist')
-    const parsed = cl ? JSON.parse(cl) : {}
-    const next = { ...parsed, [params.id]: newStatus }
+    const next = cl ? JSON.parse(cl) : {}
+    if (newStatus) next[params.id] = newStatus
+    else delete next[params.id]
     localStorage.setItem('ddokddok_checklist', JSON.stringify(next))
     setStatus(newStatus)
   }
@@ -116,7 +117,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
                 <h2 className="text-lg font-bold text-gray-800 mb-1 flex items-center gap-2">
                   <span className="text-2xl">🛒</span> 실제 인기 제품
                 </h2>
-                <p className="text-xs text-gray-400 mb-4">네이버쇼핑·쿠팡 실제 판매 데이터 기반</p>
+                <p className="text-xs text-gray-400 mb-4">네이버쇼핑 실제 판매 데이터 기반</p>
                 <div className="space-y-3">
                   {product.topProducts.map((tp: TopProduct, i: number) => (
                     <div key={i} className="flex items-center gap-4 p-3 rounded-2xl bg-amber-50 border border-amber-100">
@@ -186,25 +187,10 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
                 </div>
               </div>
 
-              {/* Affiliate Notice */}
-              <div className="bg-amber-50 rounded-xl p-3 border border-amber-100 mb-4">
-                <p className="text-xs text-amber-700 font-semibold">📢 쿠팡 파트너스 제휴 안내</p>
-                <p className="text-xs text-amber-600 mt-0.5">링크 클릭 후 구매 시 일정 수수료가 발생합니다.</p>
+              {/* Buy Link */}
+              <div className="w-full py-4 rounded-2xl bg-gray-100 text-gray-400 font-medium text-base text-center mb-3">
+                🔗 구매 링크 준비 중
               </div>
-
-              {product.coupangUrl ? (
-                <a href={product.coupangUrl}
-                   target="_blank"
-                   rel="noopener noreferrer"
-                   className="block w-full py-4 rounded-2xl text-white font-bold text-base text-center shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5 mb-3"
-                   style={{ background: 'linear-gradient(to right, #9B7EDE, #B794F6)' }}>
-                  🛍️ 쿠팡에서 바로 구매
-                </a>
-              ) : (
-                <div className="w-full py-4 rounded-2xl bg-gray-100 text-gray-400 font-medium text-base text-center mb-3">
-                  🔗 구매 링크 준비 중
-                </div>
-              )}
 
               {/* Checklist */}
               <p className="text-xs text-gray-400 text-center mb-3 font-medium">구매 현황 관리</p>
@@ -240,7 +226,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
       <footer className="mt-16 bg-white border-t border-gray-100 py-8">
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between text-sm text-gray-400">
           <Link href="/" className="font-bold text-purple-500">똑똑한 엄마</Link>
-          <p>이 정보는 참고용이며 의료적 조언이 아닙니다. · 쿠팡 파트너스 제휴 서비스</p>
+          <p>이 정보는 참고용이며 의료적 조언이 아닙니다.</p>
         </div>
       </footer>
     </div>

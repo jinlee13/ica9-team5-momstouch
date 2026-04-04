@@ -13,8 +13,10 @@
       "developStage": "반사운동기",
       "priceRange": "150,000~400,000원",
       "kcCertified": true,
-      "coupangUrl": null,
-      "ddokPillars": ["D", "T"],
+      "ddokPillars": [
+        "D",
+        "T"
+      ],
       "theoryNote": "브론펜브레너 미시체계의 첫 번째 핵심 안전 환경입니다."
     },
     {
@@ -30,8 +32,10 @@
       "developStage": "반사운동기",
       "priceRange": "20,000~60,000원",
       "kcCertified": true,
-      "coupangUrl": null,
-      "ddokPillars": ["K", "T"],
+      "ddokPillars": [
+        "K",
+        "T"
+      ],
       "theoryNote": "볼비 애착이론: 일관된 안정감이 신뢰감 형성의 토대입니다."
     },
     {
@@ -47,8 +51,9 @@
       "developStage": "반사운동기",
       "priceRange": "20,000~50,000원",
       "kcCertified": true,
-      "coupangUrl": null,
-      "ddokPillars": ["T"],
+      "ddokPillars": [
+        "T"
+      ],
       "theoryNote": "KC인증 확인 필수 — 안전이 비타협적 요소입니다."
     },
     {
@@ -64,12 +69,23 @@
       "developStage": "반사운동기",
       "priceRange": "12,000~150,000원",
       "kcCertified": true,
-      "coupangUrl": null,
-      "ddokPillars": ["K"],
+      "ddokPillars": [
+        "K"
+      ],
       "theoryNote": "에릭슨 신뢰감 형성: 일관된 수유가 최초의 신뢰 경험입니다.",
       "topProducts": [
-        { "name": "유아용 젖병 (BPA-free 유리)", "price": "12,000~15,000원", "rating": 4.5, "reviews": 250 },
-        { "name": "아기 젖병 (PPSU 소재)", "price": "15,000~25,000원", "rating": 4.5, "reviews": 50 }
+        {
+          "name": "유아용 젖병 (BPA-free 유리)",
+          "price": "12,000~15,000원",
+          "rating": 4.5,
+          "reviews": 250
+        },
+        {
+          "name": "아기 젖병 (PPSU 소재)",
+          "price": "15,000~25,000원",
+          "rating": 4.5,
+          "reviews": 50
+        }
       ]
     },
     {
@@ -85,8 +101,9 @@
       "developStage": "반사운동기",
       "priceRange": "30,000~80,000원",
       "kcCertified": true,
-      "coupangUrl": null,
-      "ddokPillars": ["K"],
+      "ddokPillars": [
+        "K"
+      ],
       "theoryNote": "볼비 전애착 단계: 수유는 최초 애착 형성의 핵심 접촉입니다."
     },
     {
@@ -102,8 +119,9 @@
       "developStage": "반사운동기",
       "priceRange": "80,000~300,000원",
       "kcCertified": true,
-      "coupangUrl": null,
-      "ddokPillars": ["T"],
+      "ddokPillars": [
+        "T"
+      ],
       "theoryNote": "상황에 따라 필요 여부가 달라집니다. 모유수유 계획 시 필수입니다."
     },
     {
@@ -119,8 +137,10 @@
       "developStage": "반사운동기",
       "priceRange": "150,000~500,000원",
       "kcCertified": true,
-      "coupangUrl": null,
-      "ddokPillars": ["D", "T"],
+      "ddokPillars": [
+        "D",
+        "T"
+      ],
       "theoryNote": "KC인증 필수. 신생아 척추·목 보호를 위한 평평한 각도가 중요합니다."
     },
     {
@@ -136,8 +156,9 @@
       "developStage": "반사운동기",
       "priceRange": "50,000~200,000원",
       "kcCertified": false,
-      "coupangUrl": null,
-      "ddokPillars": ["K"],
+      "ddokPillars": [
+        "K"
+      ],
       "theoryNote": "볼비 애착이론: 몸에 밀착한 아기띠 사용이 애착 형성에 긍정적입니다."
     },
     {
@@ -153,8 +174,10 @@
       "developStage": "반사운동기",
       "priceRange": "200,000~800,000원",
       "kcCertified": true,
-      "coupangUrl": null,
-      "ddokPillars": ["D", "T"],
+      "ddokPillars": [
+        "D",
+        "T"
+      ],
       "theoryNote": "사용 기간이 짧아 중고·대여를 적극 권장합니다."
     },
     {
@@ -170,8 +193,10 @@
       "developStage": "최초 감각 놀이",
       "priceRange": "10,000~30,000원",
       "kcCertified": false,
-      "coupangUrl": null,
-      "ddokPillars": ["D", "O"],
+      "ddokPillars": [
+        "D",
+        "O"
+      ],
       "theoryNote": "피아제 감각운동기 1단계: 반사와 감각을 통해 세상을 탐색합니다."
     },
     {
@@ -187,8 +212,9 @@
       "developStage": "반사운동기",
       "priceRange": "30,000~80,000원",
       "kcCertified": true,
-      "coupangUrl": null,
-      "ddokPillars": ["T"],
+      "ddokPillars": [
+        "T"
+      ],
       "theoryNote": "KC인증 확인 필수. 비접촉식이 신생아에게 적합합니다."
     },
     {
@@ -204,8 +230,9 @@
       "developStage": "최초 감각 놀이",
       "priceRange": "20,000~80,000원",
       "kcCertified": false,
-      "coupangUrl": null,
-      "ddokPillars": ["O"],
+      "ddokPillars": [
+        "O"
+      ],
       "theoryNote": "피아제 1차 순환반응: 얼굴·밝은 패턴 시선 추적이 시작됩니다."
     },
     {
@@ -221,8 +248,9 @@
       "developStage": "감각통합기",
       "priceRange": "20,000~60,000원",
       "kcCertified": true,
-      "coupangUrl": null,
-      "ddokPillars": ["T"],
+      "ddokPillars": [
+        "T"
+      ],
       "theoryNote": "수면 환경 조성이 브론펜브레너 미시체계 설계의 핵심입니다."
     },
     {
@@ -238,8 +266,10 @@
       "developStage": "감각통합기",
       "priceRange": "30,000~100,000원",
       "kcCertified": true,
-      "coupangUrl": null,
-      "ddokPillars": ["K", "T"],
+      "ddokPillars": [
+        "K",
+        "T"
+      ],
       "theoryNote": "에릭슨 신뢰감: 예측 가능한 환경이 아기의 안정감을 높입니다."
     },
     {
@@ -255,8 +285,10 @@
       "developStage": "감각통합기",
       "priceRange": "30,000~80,000원",
       "kcCertified": true,
-      "coupangUrl": null,
-      "ddokPillars": ["D", "T"],
+      "ddokPillars": [
+        "D",
+        "T"
+      ],
       "theoryNote": "WHO: 과도한 보온은 오히려 위험. 계절에 맞는 적정 두께가 중요합니다."
     },
     {
@@ -272,8 +304,9 @@
       "developStage": "위생 관리",
       "priceRange": "10,000~30,000원",
       "kcCertified": false,
-      "coupangUrl": null,
-      "ddokPillars": ["T"],
+      "ddokPillars": [
+        "T"
+      ],
       "theoryNote": "모유수유 중인 경우에만 필요합니다."
     },
     {
@@ -289,8 +322,9 @@
       "developStage": "감각통합기",
       "priceRange": "30,000~80,000원",
       "kcCertified": true,
-      "coupangUrl": null,
-      "ddokPillars": ["T"],
+      "ddokPillars": [
+        "T"
+      ],
       "theoryNote": "분유수유 시에만 해당. 야간 수유 빈도가 높은 시기에 특히 유용합니다."
     },
     {
@@ -306,8 +340,9 @@
       "developStage": "월령별 교체 권장",
       "priceRange": "10,000~30,000원",
       "kcCertified": false,
-      "coupangUrl": null,
-      "ddokPillars": ["D"],
+      "ddokPillars": [
+        "D"
+      ],
       "theoryNote": "젖병 수유 시에만 해당. 수유 속도가 너무 빠르면 과식 위험이 있습니다."
     },
     {
@@ -323,8 +358,10 @@
       "developStage": "장거리 외출 필수템",
       "priceRange": "200,000~1,000,000원",
       "kcCertified": false,
-      "coupangUrl": null,
-      "ddokPillars": ["D", "T"],
+      "ddokPillars": [
+        "D",
+        "T"
+      ],
       "theoryNote": "브론펜브레너: 외부 환경 탐색 확대가 발달을 촉진합니다."
     },
     {
@@ -340,8 +377,9 @@
       "developStage": "사계절 사용 가능",
       "priceRange": "20,000~60,000원",
       "kcCertified": false,
-      "coupangUrl": null,
-      "ddokPillars": ["T"],
+      "ddokPillars": [
+        "T"
+      ],
       "theoryNote": "외출 시 급격한 기온 변화에 민감한 시기입니다."
     },
     {
@@ -357,8 +395,9 @@
       "developStage": "외출 필수 준비물",
       "priceRange": "30,000~100,000원",
       "kcCertified": false,
-      "coupangUrl": null,
-      "ddokPillars": ["T"],
+      "ddokPillars": [
+        "T"
+      ],
       "theoryNote": "기저귀 교체용 접이식 매트가 포함된 제품이 유용합니다."
     },
     {
@@ -374,8 +413,10 @@
       "developStage": "감각통합기",
       "priceRange": "15,000~40,000원",
       "kcCertified": true,
-      "coupangUrl": null,
-      "ddokPillars": ["D", "O"],
+      "ddokPillars": [
+        "D",
+        "O"
+      ],
       "theoryNote": "피아제 감각운동기: 물건을 잡고 입으로 탐색하기 시작합니다."
     },
     {
@@ -391,8 +432,10 @@
       "developStage": "잇몸 가려움 해소",
       "priceRange": "10,000~30,000원",
       "kcCertified": false,
-      "coupangUrl": null,
-      "ddokPillars": ["D", "O"],
+      "ddokPillars": [
+        "D",
+        "O"
+      ],
       "theoryNote": "비고츠키 ZPD: 조금 더 어려운 자극이 발달을 이끕니다."
     },
     {
@@ -408,8 +451,9 @@
       "developStage": "잠깐의 여유 확보",
       "priceRange": "80,000~300,000원",
       "kcCertified": false,
-      "coupangUrl": null,
-      "ddokPillars": ["K"],
+      "ddokPillars": [
+        "K"
+      ],
       "theoryNote": "사회적 미소가 시작되는 시기(6~8주). 눈 맞춤과 상호작용이 중요합니다."
     },
     {
@@ -425,8 +469,9 @@
       "developStage": "목 가누기-앉기",
       "priceRange": "20,000~60,000원",
       "kcCertified": false,
-      "coupangUrl": null,
-      "ddokPillars": ["T"],
+      "ddokPillars": [
+        "T"
+      ],
       "theoryNote": "피부가 민감한 시기. 부드러운 면 소재를 권장합니다."
     },
     {
@@ -442,8 +487,9 @@
       "developStage": "목 가누기-앉기",
       "priceRange": "40,000~80,000원",
       "kcCertified": false,
-      "coupangUrl": null,
-      "ddokPillars": ["D"],
+      "ddokPillars": [
+        "D"
+      ],
       "theoryNote": "WHO: 도움 받아 앉기 가능 시기. 30분 이상 연속 사용은 피해주세요."
     },
     {
@@ -459,8 +505,10 @@
       "developStage": "목 가누기-앉기",
       "priceRange": "30,000~80,000원",
       "kcCertified": true,
-      "coupangUrl": null,
-      "ddokPillars": ["D", "T"],
+      "ddokPillars": [
+        "D",
+        "T"
+      ],
       "theoryNote": "K-DST: 앞→뒤, 뒤→앞 뒤집기가 4~5개월에 시작됩니다."
     },
     {
@@ -476,12 +524,23 @@
       "developStage": "이유식 준비 단계",
       "priceRange": "20,000~60,000원",
       "kcCertified": false,
-      "coupangUrl": null,
-      "ddokPillars": ["T"],
+      "ddokPillars": [
+        "T"
+      ],
       "theoryNote": "AAP: 입술 다물기 = 이유식 시작 신호. 준비물을 미리 갖춰두세요.",
       "topProducts": [
-        { "name": "파파루 간편레시피 유기농 쌀가루 백미 초기", "price": "7,300원", "rating": 4.8, "reviews": 5125 },
-        { "name": "퍼기 유기농 이유식 쌀가루 가루입자 초기", "price": "10,000원", "rating": 4.5, "reviews": 2952 }
+        {
+          "name": "파파루 간편레시피 유기농 쌀가루 백미 초기",
+          "price": "7,300원",
+          "rating": 4.8,
+          "reviews": 5125
+        },
+        {
+          "name": "퍼기 유기농 이유식 쌀가루 가루입자 초기",
+          "price": "10,000원",
+          "rating": 4.5,
+          "reviews": 2952
+        }
       ]
     },
     {
@@ -497,8 +556,9 @@
       "developStage": "이유식 준비 단계",
       "priceRange": "10,000~30,000원",
       "kcCertified": false,
-      "coupangUrl": null,
-      "ddokPillars": ["D"],
+      "ddokPillars": [
+        "D"
+      ],
       "theoryNote": "이유식 시작 전부터 착용 연습을 해두면 거부감을 줄일 수 있습니다."
     },
     {
@@ -514,8 +574,9 @@
       "developStage": "목 가누기-앉기",
       "priceRange": "10,000~25,000원",
       "kcCertified": true,
-      "coupangUrl": null,
-      "ddokPillars": ["D"],
+      "ddokPillars": [
+        "D"
+      ],
       "theoryNote": "처음에는 한 번에 한 가지 재료씩 시작하는 것이 권장됩니다."
     },
     {
@@ -531,8 +592,9 @@
       "developStage": "목 가누기-앉기",
       "priceRange": "10,000~30,000원",
       "kcCertified": true,
-      "coupangUrl": null,
-      "ddokPillars": ["T"],
+      "ddokPillars": [
+        "T"
+      ],
       "theoryNote": "AAP: 6개월 미만에는 자외선 차단제보다 물리적 차단(옷, 모자)을 권장합니다."
     },
     {
@@ -548,8 +610,10 @@
       "developStage": "목 가누기-앉기",
       "priceRange": "100,000~250,000원",
       "kcCertified": true,
-      "coupangUrl": null,
-      "ddokPillars": ["D", "K"],
+      "ddokPillars": [
+        "D",
+        "K"
+      ],
       "theoryNote": "볼비 애착이론: 밀착 외출이 안정적인 애착 형성에 도움이 됩니다."
     },
     {
@@ -565,8 +629,9 @@
       "developStage": "외출 전 필수",
       "priceRange": "15,000~40,000원",
       "kcCertified": false,
-      "coupangUrl": null,
-      "ddokPillars": ["T"],
+      "ddokPillars": [
+        "T"
+      ],
       "theoryNote": "무기자차 제품(징크옥사이드, 티타늄디옥사이드)이 영아에게 안전합니다."
     },
     {
@@ -582,8 +647,10 @@
       "developStage": "전신 운동과 감각 발달",
       "priceRange": "50,000~150,000원",
       "kcCertified": false,
-      "coupangUrl": null,
-      "ddokPillars": ["D", "O"],
+      "ddokPillars": [
+        "D",
+        "O"
+      ],
       "theoryNote": "피아제 2차 순환반응 시작: 딸랑이 잡고 흔들기로 원인-결과를 탐색합니다."
     },
     {
@@ -599,8 +666,9 @@
       "developStage": "냉장 보관으로 시원하게",
       "priceRange": "10,000~30,000원",
       "kcCertified": false,
-      "coupangUrl": null,
-      "ddokPillars": ["D"],
+      "ddokPillars": [
+        "D"
+      ],
       "theoryNote": "물건을 잡고 입으로 탐색하는 구강 탐색기가 본격화됩니다."
     },
     {
@@ -616,8 +684,10 @@
       "developStage": "목 가누기-앉기",
       "priceRange": "30,000~80,000원",
       "kcCertified": true,
-      "coupangUrl": null,
-      "ddokPillars": ["D", "T"],
+      "ddokPillars": [
+        "D",
+        "T"
+      ],
       "theoryNote": "목욕 시간을 감각 놀이로 활용하면 발달 자극에 효과적입니다."
     },
     {
@@ -633,8 +703,10 @@
       "developStage": "앉기-기기-서기",
       "priceRange": "150,000~400,000원",
       "kcCertified": true,
-      "coupangUrl": null,
-      "ddokPillars": ["D", "T"],
+      "ddokPillars": [
+        "D",
+        "T"
+      ],
       "theoryNote": "WHO: 혼자 앉기 완성 평균 6개월. 이유식 의자는 이 시기의 핵심 아이템입니다."
     },
     {
@@ -650,8 +722,10 @@
       "developStage": "앉기-기기-서기",
       "priceRange": "100,000~300,000원",
       "kcCertified": true,
-      "coupangUrl": null,
-      "ddokPillars": ["D", "T"],
+      "ddokPillars": [
+        "D",
+        "T"
+      ],
       "theoryNote": "브론펜브레너: 이동 반경이 확대되는 시기. 안전한 탐색 공간 설계가 중요합니다."
     },
     {
@@ -667,8 +741,9 @@
       "developStage": "안전한 수면 환경",
       "priceRange": "30,000~80,000원",
       "kcCertified": false,
-      "coupangUrl": null,
-      "ddokPillars": ["T"],
+      "ddokPillars": [
+        "T"
+      ],
       "theoryNote": "이불보다 슬리핑백이 영아 돌연사 예방에 더 안전합니다."
     },
     {
@@ -684,12 +759,23 @@
       "developStage": "이유식 2단계",
       "priceRange": "50,000~200,000원",
       "kcCertified": false,
-      "coupangUrl": null,
-      "ddokPillars": ["T"],
+      "ddokPillars": [
+        "T"
+      ],
       "theoryNote": "6개월부터 중기 이유식으로 다양한 식재료 도입이 권장됩니다.",
       "topProducts": [
-        { "name": "아기 이유식 조리기 (찌기+갈기+보관)", "price": "70,000원", "rating": 4.9, "reviews": 50 },
-        { "name": "이유식 중기 흡착 그릇 세트", "price": "15,000원", "rating": null, "reviews": 167 }
+        {
+          "name": "아기 이유식 조리기 (찌기+갈기+보관)",
+          "price": "70,000원",
+          "rating": 4.9,
+          "reviews": 50
+        },
+        {
+          "name": "이유식 중기 흡착 그릇 세트",
+          "price": "15,000원",
+          "rating": null,
+          "reviews": 167
+        }
       ]
     },
     {
@@ -705,12 +791,23 @@
       "developStage": "자기 주도 식사 준비",
       "priceRange": "12,000~17,000원",
       "kcCertified": false,
-      "coupangUrl": null,
-      "ddokPillars": ["D"],
+      "ddokPillars": [
+        "D"
+      ],
       "theoryNote": "K-DST 소근육: 집게 쥐기(Pincer grip)가 시작되는 시기입니다.",
       "topProducts": [
-        { "name": "에디슨 스스로 실리콘 양손 빨대컵 200ml", "price": "12,340원", "rating": 4.5, "reviews": 6712 },
-        { "name": "베베픽 유아용 원터치 PPSU 빨대컵 250ml", "price": "16,800원", "rating": 4.5, "reviews": 272 }
+        {
+          "name": "에디슨 스스로 실리콘 양손 빨대컵 200ml",
+          "price": "12,340원",
+          "rating": 4.5,
+          "reviews": 6712
+        },
+        {
+          "name": "베베픽 유아용 원터치 PPSU 빨대컵 250ml",
+          "price": "16,800원",
+          "rating": 4.5,
+          "reviews": 272
+        }
       ]
     },
     {
@@ -726,11 +823,18 @@
       "developStage": "핑거푸드 시작",
       "priceRange": "10,000~25,000원",
       "kcCertified": false,
-      "coupangUrl": null,
-      "ddokPillars": ["D", "O"],
+      "ddokPillars": [
+        "D",
+        "O"
+      ],
       "theoryNote": "아이 주도 이유식(BLW)을 진행하는 경우 특히 유용합니다.",
       "topProducts": [
-        { "name": "안전한 유아 식기 세트 (흡착 그릇)", "price": "15,000원", "rating": 4.5, "reviews": 120 }
+        {
+          "name": "안전한 유아 식기 세트 (흡착 그릇)",
+          "price": "15,000원",
+          "rating": 4.5,
+          "reviews": 120
+        }
       ]
     },
     {
@@ -746,8 +850,10 @@
       "developStage": "앉기-기기-서기",
       "priceRange": "50,000~150,000원",
       "kcCertified": true,
-      "coupangUrl": null,
-      "ddokPillars": ["D", "T"],
+      "ddokPillars": [
+        "D",
+        "T"
+      ],
       "theoryNote": "WHO 평균 8.5개월 기기 시작. 기기 전에 미리 설치해두는 것이 안전합니다."
     },
     {
@@ -763,8 +869,9 @@
       "developStage": "기기 시작 전 설치 권장",
       "priceRange": "20,000~60,000원",
       "kcCertified": false,
-      "coupangUrl": null,
-      "ddokPillars": ["T"],
+      "ddokPillars": [
+        "T"
+      ],
       "theoryNote": "탐색 욕구가 폭발하는 시기. 집 안 전체 안전 점검이 필요합니다."
     },
     {
@@ -780,8 +887,9 @@
       "developStage": "앉기-기기-서기",
       "priceRange": "20,000~50,000원",
       "kcCertified": true,
-      "coupangUrl": null,
-      "ddokPillars": ["T"],
+      "ddokPillars": [
+        "T"
+      ],
       "theoryNote": "이유식을 시작한 시기 외출 시 보온 용기는 필수입니다."
     },
     {
@@ -797,8 +905,9 @@
       "developStage": "언어 발달 준비",
       "priceRange": "20,000~60,000원",
       "kcCertified": false,
-      "coupangUrl": null,
-      "ddokPillars": ["O"],
+      "ddokPillars": [
+        "O"
+      ],
       "theoryNote": "AAP: '엄마·아빠' 의미 있게 말하기 준비 단계. 풍부한 언어 자극이 중요합니다."
     },
     {
@@ -814,8 +923,10 @@
       "developStage": "앉기-기기-서기",
       "priceRange": "20,000~60,000원",
       "kcCertified": true,
-      "coupangUrl": null,
-      "ddokPillars": ["D", "O"],
+      "ddokPillars": [
+        "D",
+        "O"
+      ],
       "theoryNote": "피아제 대상영속성 발달(8~9개월): 숨긴 물건을 찾는 능력이 생깁니다."
     },
     {
@@ -831,8 +942,9 @@
       "developStage": "서기-걷기 준비",
       "priceRange": "30,000~100,000원",
       "kcCertified": false,
-      "coupangUrl": null,
-      "ddokPillars": ["D"],
+      "ddokPillars": [
+        "D"
+      ],
       "theoryNote": "WHO: 걷기 시작 평균 12개월(범위 8.2~17.6개월). 개인차가 큽니다."
     },
     {
@@ -848,8 +960,9 @@
       "developStage": "걷기-언어발달기",
       "priceRange": "10,000~25,000원",
       "kcCertified": true,
-      "coupangUrl": null,
-      "ddokPillars": ["T"],
+      "ddokPillars": [
+        "T"
+      ],
       "theoryNote": "K-DST 자조 영역: 이 시기부터 자조 능력 발달이 시작됩니다."
     },
     {
@@ -865,8 +978,10 @@
       "developStage": "어린이집 준비",
       "priceRange": "30,000~80,000원",
       "kcCertified": false,
-      "coupangUrl": null,
-      "ddokPillars": ["K", "T"],
+      "ddokPillars": [
+        "K",
+        "T"
+      ],
       "theoryNote": "에릭슨 자율성: 자신의 이불로 독립심과 소속감을 키웁니다."
     },
     {
@@ -882,8 +997,10 @@
       "developStage": "독립 수면 준비",
       "priceRange": "80,000~200,000원",
       "kcCertified": false,
-      "coupangUrl": null,
-      "ddokPillars": ["D", "T"],
+      "ddokPillars": [
+        "D",
+        "T"
+      ],
       "theoryNote": "걷기 시작 후 침대에서 스스로 내려오다 낙상 사고가 빈번합니다."
     },
     {
@@ -899,11 +1016,18 @@
       "developStage": "자기 주도 식사",
       "priceRange": "22,000~30,000원",
       "kcCertified": false,
-      "coupangUrl": null,
-      "ddokPillars": ["D", "K"],
+      "ddokPillars": [
+        "D",
+        "K"
+      ],
       "theoryNote": "에릭슨 자율성: '내가 할 거야'를 격려하는 환경이 중요합니다.",
       "topProducts": [
-        { "name": "유아용 스테인리스 식기 세트 (흡착)", "price": "22,000원", "rating": 4.8, "reviews": 85 }
+        {
+          "name": "유아용 스테인리스 식기 세트 (흡착)",
+          "price": "22,000원",
+          "rating": 4.8,
+          "reviews": 85
+        }
       ]
     },
     {
@@ -919,11 +1043,17 @@
       "developStage": "셀프피딩 완성",
       "priceRange": "10,000~25,000원",
       "kcCertified": false,
-      "coupangUrl": null,
-      "ddokPillars": ["D"],
+      "ddokPillars": [
+        "D"
+      ],
       "theoryNote": "피아제 전조작기: 상징 놀이와 모방이 시작되는 시기입니다.",
       "topProducts": [
-        { "name": "유아용 스테인리스 빨대 (안전형)", "price": "19,900원", "rating": 4.8, "reviews": 80 }
+        {
+          "name": "유아용 스테인리스 빨대 (안전형)",
+          "price": "19,900원",
+          "rating": 4.8,
+          "reviews": 80
+        }
       ]
     },
     {
@@ -939,12 +1069,23 @@
       "developStage": "젖병 졸업",
       "priceRange": "11,000~17,000원",
       "kcCertified": false,
-      "coupangUrl": null,
-      "ddokPillars": ["D"],
+      "ddokPillars": [
+        "D"
+      ],
       "theoryNote": "AAP: 12개월부터 젖병 졸업을 권장합니다.",
       "topProducts": [
-        { "name": "그로미미 PPSU 빨대컵", "price": "16,370원", "rating": 5.0, "reviews": 12321 },
-        { "name": "기용니 아기 빨대컵", "price": "11,150원", "rating": 5.0, "reviews": 100 }
+        {
+          "name": "그로미미 PPSU 빨대컵",
+          "price": "16,370원",
+          "rating": 5,
+          "reviews": 12321
+        },
+        {
+          "name": "기용니 아기 빨대컵",
+          "price": "11,150원",
+          "rating": 5,
+          "reviews": 100
+        }
       ]
     },
     {
@@ -960,8 +1101,9 @@
       "developStage": "첫 걸음 시작",
       "priceRange": "30,000~80,000원",
       "kcCertified": false,
-      "coupangUrl": null,
-      "ddokPillars": ["D"],
+      "ddokPillars": [
+        "D"
+      ],
       "theoryNote": "WHO: 첫 걸음 평균 12개월. 발볼이 넓고 미끄럼 방지 처리된 신발을 선택하세요."
     },
     {
@@ -977,8 +1119,10 @@
       "developStage": "낙상 사고 예방",
       "priceRange": "30,000~80,000원",
       "kcCertified": false,
-      "coupangUrl": null,
-      "ddokPillars": ["D", "T"],
+      "ddokPillars": [
+        "D",
+        "T"
+      ],
       "theoryNote": "킥보드나 세발자전거를 사용할 예정인 경우에 필요합니다."
     },
     {
@@ -994,8 +1138,9 @@
       "developStage": "외출 편의 증대",
       "priceRange": "20,000~50,000원",
       "kcCertified": false,
-      "coupangUrl": null,
-      "ddokPillars": ["T"],
+      "ddokPillars": [
+        "T"
+      ],
       "theoryNote": "필수는 아니지만 외출이 잦다면 편의성이 높아집니다."
     },
     {
@@ -1011,8 +1156,10 @@
       "developStage": "모방 놀이 시작",
       "priceRange": "30,000~100,000원",
       "kcCertified": false,
-      "coupangUrl": null,
-      "ddokPillars": ["O", "K"],
+      "ddokPillars": [
+        "O",
+        "K"
+      ],
       "theoryNote": "피아제 심적 표상: 전화기 귀에 대기 등 흉내 놀이가 시작됩니다."
     },
     {
@@ -1028,8 +1175,10 @@
       "developStage": "독립심 형성",
       "priceRange": "80,000~200,000원",
       "kcCertified": false,
-      "coupangUrl": null,
-      "ddokPillars": ["D", "K"],
+      "ddokPillars": [
+        "D",
+        "K"
+      ],
       "theoryNote": "에릭슨 자율성 단계: 스스로 할 수 있는 공간이 자립심을 길러줍니다."
     },
     {
@@ -1045,8 +1194,9 @@
       "developStage": "언어 폭발기 시작",
       "priceRange": "30,000~100,000원",
       "kcCertified": false,
-      "coupangUrl": null,
-      "ddokPillars": ["O"],
+      "ddokPillars": [
+        "O"
+      ],
       "theoryNote": "비고츠키: 언어가 사고의 도구로 기능하기 시작합니다. 하루 1권 이상 읽어주세요."
     },
     {
@@ -1062,8 +1212,9 @@
       "developStage": "자율성 발달기",
       "priceRange": "30,000~80,000원",
       "kcCertified": false,
-      "coupangUrl": null,
-      "ddokPillars": ["T"],
+      "ddokPillars": [
+        "T"
+      ],
       "theoryNote": "독립 수면이 시작되는 시기. 낙상 위험이 있으므로 안전 가드가 필요합니다."
     },
     {
@@ -1079,8 +1230,9 @@
       "developStage": "수면 질 향상",
       "priceRange": "30,000~100,000원",
       "kcCertified": false,
-      "coupangUrl": null,
-      "ddokPillars": ["T"],
+      "ddokPillars": [
+        "T"
+      ],
       "theoryNote": "빛에 민감한 낮잠 시간대에 특히 효과적입니다."
     },
     {
@@ -1096,8 +1248,10 @@
       "developStage": "독립 수면 루틴",
       "priceRange": "10,000~25,000원",
       "kcCertified": false,
-      "coupangUrl": null,
-      "ddokPillars": ["O", "K"],
+      "ddokPillars": [
+        "O",
+        "K"
+      ],
       "theoryNote": "일관된 취침 루틴(목욕-책-잠)이 수면 습관 형성에 효과적입니다."
     },
     {
@@ -1113,8 +1267,9 @@
       "developStage": "자율성 발달기",
       "priceRange": "15,000~40,000원",
       "kcCertified": false,
-      "coupangUrl": null,
-      "ddokPillars": ["D"],
+      "ddokPillars": [
+        "D"
+      ],
       "theoryNote": "에릭슨 자율성 완성 단계: 스스로 할 수 있는 경험이 자존감을 높입니다."
     },
     {
@@ -1130,8 +1285,10 @@
       "developStage": "어린이집 준비",
       "priceRange": "20,000~50,000원",
       "kcCertified": false,
-      "coupangUrl": null,
-      "ddokPillars": ["K", "T"],
+      "ddokPillars": [
+        "K",
+        "T"
+      ],
       "theoryNote": "브론펜브레너: 어린이집 환경이 새로운 미시체계가 됩니다."
     },
     {
@@ -1147,8 +1304,9 @@
       "developStage": "간식 자립",
       "priceRange": "5,000~20,000원",
       "kcCertified": false,
-      "coupangUrl": null,
-      "ddokPillars": ["D"],
+      "ddokPillars": [
+        "D"
+      ],
       "theoryNote": "WHO: 하루 2회 간식이 적절합니다. 당분이 낮은 자연식 간식을 권장합니다."
     },
     {
@@ -1164,8 +1322,9 @@
       "developStage": "자율성 발달기",
       "priceRange": "50,000~150,000원",
       "kcCertified": false,
-      "coupangUrl": null,
-      "ddokPillars": ["D"],
+      "ddokPillars": [
+        "D"
+      ],
       "theoryNote": "K-DST: 뛰기·공 차기·계단 오르기가 가능한 시기입니다."
     },
     {
@@ -1181,8 +1340,10 @@
       "developStage": "날씨 개념 인지",
       "priceRange": "15,000~40,000원",
       "kcCertified": false,
-      "coupangUrl": null,
-      "ddokPillars": ["O", "K"],
+      "ddokPillars": [
+        "O",
+        "K"
+      ],
       "theoryNote": "날씨에 따라 옷과 준비물을 달리한다는 개념을 가르치는 좋은 기회입니다."
     },
     {
@@ -1198,8 +1359,9 @@
       "developStage": "야외 활동 증가",
       "priceRange": "10,000~30,000원",
       "kcCertified": false,
-      "coupangUrl": null,
-      "ddokPillars": ["T"],
+      "ddokPillars": [
+        "T"
+      ],
       "theoryNote": "UV400 차단 인증이 있는 제품을 선택하세요."
     },
     {
@@ -1215,8 +1377,10 @@
       "developStage": "자율성 발달기",
       "priceRange": "30,000~100,000원",
       "kcCertified": false,
-      "coupangUrl": null,
-      "ddokPillars": ["D", "O"],
+      "ddokPillars": [
+        "D",
+        "O"
+      ],
       "theoryNote": "피아제 전조작기: 가상 놀이와 상징 사고가 발달하는 시기입니다."
     },
     {
@@ -1232,8 +1396,9 @@
       "developStage": "집중력 발달",
       "priceRange": "15,000~40,000원",
       "kcCertified": false,
-      "coupangUrl": null,
-      "ddokPillars": ["O"],
+      "ddokPillars": [
+        "O"
+      ],
       "theoryNote": "성공 경험의 축적이 에릭슨 주도성 발달의 기반이 됩니다."
     },
     {
@@ -1249,8 +1414,9 @@
       "developStage": "대근육 발달",
       "priceRange": "100,000~500,000원",
       "kcCertified": true,
-      "coupangUrl": null,
-      "ddokPillars": ["D"],
+      "ddokPillars": [
+        "D"
+      ],
       "theoryNote": "비고츠키: 또래와의 신체 놀이가 사회성 발달에 중요합니다."
     }
   ],

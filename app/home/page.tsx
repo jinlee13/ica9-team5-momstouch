@@ -209,11 +209,6 @@ export default function HomePage() {
                     key={product.id}
                     product={product}
                     checklistState={checklistState}
-                    onChecklistChange={(id, status) => {
-                      const next = { ...checklistState, [id]: status }
-                      setChecklistState(next)
-                      localStorage.setItem('ddokddok_checklist', JSON.stringify(next))
-                    }}
                   />
                 ))}
               </div>
@@ -226,7 +221,7 @@ export default function HomePage() {
       <footer className="mt-16 bg-white border-t border-gray-100 py-8">
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-3 text-sm text-gray-400">
           <Link href="/" className="font-bold text-purple-500">똑똑한 엄마</Link>
-          <p>이 정보는 참고용이며 의료적 조언이 아닙니다. · 쿠팡 파트너스 제휴 서비스</p>
+          <p>이 정보는 참고용이며 의료적 조언이 아닙니다.</p>
         </div>
       </footer>
     </div>
@@ -236,22 +231,37 @@ export default function HomePage() {
 function ProductCard({
   product,
   checklistState,
-  onChecklistChange,
 }: {
   product: ProductWithPriority
   checklistState: Record<string, string>
-  onChecklistChange: (id: string, status: string) => void
 }) {
+  const router = useRouter()
   const necessity = NECESSITY_LABELS[product.necessity]
   const category = CATEGORY_INFO[product.categorySlug]
   const status = checklistState[product.id]
 
+  const statusStyle =
+    status === 'BOUGHT' ? 'border-green-200' :
+    status === 'PENDING' ? 'border-yellow-200' :
+    status === 'SKIP' ? 'border-red-100' :
+    'border-gray-100 hover:border-purple-200'
+
+  const checkBtnStyle =
+    status === 'BOUGHT' ? 'bg-green-100 text-green-700 border-green-300' :
+    status === 'PENDING' ? 'bg-yellow-100 text-yellow-700 border-yellow-300' :
+    status === 'SKIP' ? 'bg-red-50 text-red-500 border-red-200' :
+    'border-purple-200 text-purple-600 hover:bg-purple-50'
+
+  const checkBtnLabel =
+    status === 'BOUGHT' ? '✅ 완료' :
+    status === 'PENDING' ? '⏳ 보류' :
+    status === 'SKIP' ? '🚫 생략' :
+    '☑️ 체크'
+
   return (
-    <div className={`bg-white rounded-2xl border-2 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col overflow-hidden ${
-      status === 'BOUGHT' ? 'border-green-200' : 'border-gray-100 hover:border-purple-200'
-    }`}>
+    <div className={`bg-white rounded-2xl border-2 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col overflow-hidden ${statusStyle}`}>
       {/* Card Top */}
-      <div className={`px-5 pt-5 pb-4`}>
+      <div className="px-5 pt-5 pb-4">
         <div className="flex items-start justify-between gap-2 mb-3">
           <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0 ${category?.color ?? 'bg-gray-50'}`}>
             {category?.icon}
@@ -292,13 +302,9 @@ function ProductCard({
             자세히
           </Link>
           <button
-            onClick={() => onChecklistChange(product.id, status === 'BOUGHT' ? '' : 'BOUGHT')}
-            className={`flex-1 py-2.5 text-center text-sm font-semibold rounded-xl border-2 transition-all ${
-              status === 'BOUGHT'
-                ? 'bg-green-100 text-green-700 border-green-200'
-                : 'border-purple-200 text-purple-600 hover:bg-purple-50'
-            }`}>
-            {status === 'BOUGHT' ? '✅ 완료' : '+ 체크'}
+            onClick={() => router.push('/checklist')}
+            className={`flex-1 py-2.5 text-center text-sm font-semibold rounded-xl border-2 transition-all ${checkBtnStyle}`}>
+            {checkBtnLabel}
           </button>
         </div>
       </div>

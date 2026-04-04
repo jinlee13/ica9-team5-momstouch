@@ -163,7 +163,7 @@ export default function LandingPage() {
             {[
               { step: '01', icon: '🗓️', title: '생년월일 입력', desc: '아이 생년월일만 입력하면 개월 수를 자동으로 계산해요. 회원가입 없이 바로 시작!' },
               { step: '02', icon: '🎯', title: '맞춤 추천 확인', desc: '지금 필요 / 곧 필요 / 아직 이른 것으로 나눠 타이밍에 맞는 추천을 보여줘요.' },
-              { step: '03', icon: '✅', title: '구매 & 체크', desc: '체크리스트로 구매 현황을 관리하세요. 쿠팡 파트너스 링크로 바로 구매도 가능해요.' },
+              { step: '03', icon: '✅', title: '구매 & 체크', desc: '체크리스트로 구매 현황을 관리하세요. 완료·보류·생략으로 구매 상태를 기록할 수 있어요.' },
             ].map((item) => (
               <div key={item.step} className="relative p-8 rounded-3xl border-2 border-gray-100 hover:border-purple-200 hover:shadow-lg transition-all duration-300 group">
                 <div className="absolute top-6 right-6 text-5xl font-black text-gray-50 group-hover:text-purple-50 transition-colors select-none">{item.step}</div>
@@ -296,7 +296,7 @@ export default function LandingPage() {
             <p className="text-xs mt-1">아이 발달 단계에 맞는 육아용품 추천 서비스</p>
           </div>
           <p className="text-xs text-center md:text-right">
-            이 정보는 참고용이며 의료적 조언이 아닙니다. · 쿠팡 파트너스 제휴 서비스
+            이 정보는 참고용이며 의료적 조언이 아닙니다.
           </p>
         </div>
       </footer>
