@@ -1,6 +1,6 @@
 # 똑똑한 엄마 — TRD (Technical Requirements Document)
 
-**버전:** 1.0 | **작성일:** 2026-04-01
+**버전:** 1.2 | **작성일:** 2026-04-01
 **대상 독자:** 개발 팀원 + 개발자 멘토
 **전제:** Claude Code 등 AI 코딩 어시스턴트를 활용하여 비개발자 팀이 개발을 주도
 
@@ -115,15 +115,57 @@ PostgreSQL  - 네이버 쇼핑 검색 API
 
 ## 3. 데이터베이스 설계
 
+### v1 외부 연동 모드 결정 (Scope Freeze)
+
+> GPT 검토 반영: 외부 API를 stub/manual/live 중 하나로 확정. AI가 임의로 연동 구조를 만들지 않도록 잠금.
+
+| 데이터 | v1 모드 | 설명 |
+|--------|:------:|------|
+| 가격 | **manual** | seed 데이터에 범위값 직접 입력 ("3~8만 원대") |
+| KC/리콜 정보 | **manual** | seed 데이터에 수동 입력, 자동 연동은 Phase 3 |
+| 쿠팡 파트너스 링크 | **manual** | 상품별 URL 직접 입력 |
+| 인기도 스코어 | **stub** | 기본값 0.5 고정 (Phase 3에서 실제값 교체) |
+| 네이버 쇼핑 가격 API | **Phase 2** | v1 제외 |
+| 네이버 쇼핑인사이트 API | **Phase 3** | v1 제외 |
+| SafetyKorea API | **Phase 3** | v1 제외 |
+
+### Seed 데이터 명세 (v1 핵심 자산)
+
+> 이 서비스는 코드보다 데이터가 먼저. DB seed 파일이 완성되어야 추천 엔진이 작동.
+
+**필요 파일 목록:**
+- `prisma/seed/categories.csv`
+- `prisma/seed/products.csv`
+- `prisma/seed/lifecycle_rules.csv`
+
+**lifecycle_rules.csv 컬럼 명세:**
+
+| 컬럼 | 타입 | 예시 | 필수 |
+|------|------|------|:---:|
+| `category_slug` | string | `"feeding"` | ✅ |
+| `product_name` | string | `"이유식 의자"` | ✅ |
+| `age_group_slug` | string | `"6-12m"` | ✅ |
+| `age_min_months` | int | `6` | ✅ |
+| `age_max_months` | int | `11` | ✅ |
+| `priority` | NOW/SOON/LATER | `"NOW"` | ✅ |
+| `necessity` | ESSENTIAL/SITUATIONAL/OPTIONAL/RENT_OR_USED | `"ESSENTIAL"` | ✅ |
+| `reason` | string | `"7개월은 이유식을 본격 시작하는 시기입니다."` | ✅ |
+| `develop_stage` | string | `"이유식 2단계 시작, 앉기 가능"` | 권장 |
+| `price_range` | string | `"30,000~80,000원"` | 권장 |
+| `kc_certified` | boolean | `true` | 권장 |
+| `coupang_url` | string | `"https://..."` | 권장 |
+
+**v1 목표 데이터 수:** 6구간 × 4카테고리 × 3아이템 = **최소 72행**
+
 ### 주요 테이블 목록
 
 | 테이블 | 설명 |
 |--------|------|
-| `categories` | 10개 핵심 카테고리 정의 |
+| `categories` | 4개 상위 카테고리 (v1), Phase 2에서 10개 세부 추가 |
 | `products` | 육아용품 마스터 데이터 |
-| `lifecycle_rules` | 개월 수별 추천 룰 **(핵심 자산)** |
-| `product_safety` | 안전 인증 정보 (KC인증, 리콜) |
-| `api_cache` | 외부 API 응답 캐시 |
+| `lifecycle_rules` | 개월 수별 추천 룰 **(핵심 자산 — seed 먼저 완성)** |
+| `product_safety` | 안전 인증 정보 (v1은 수동 입력, Phase 3에서 자동화) |
+| `api_cache` | 외부 API 응답 캐시 (Phase 2 이후 활성화) |
 
 ### Prisma 스키마 (schema.prisma)
 
@@ -320,15 +362,35 @@ export function getAgeGroupSlug(ageMonths: number): string {
 **로직 흐름**
 
 ```
-입력: 생년월일
-  → 개월 수 계산 (calcAgeMonths)
-  → 연령 구간 결정 (getAgeGroupSlug)
-  → DB 쿼리: LifecycleRule (ageMinMonths ≤ 개월 수 ≤ ageMaxMonths)
+[클라이언트]
+  생년월일 입력 (localStorage 저장)
+  → calcAgeMonths() → getAgeGroupSlug()
+  → GET /api/recommendations?ageGroup=6-12m&filter=NOW
+
+[서버]
+  ageGroupSlug 수신
+  → DB 쿼리: LifecycleRule WHERE ageGroupSlug = '6-12m'
   → priority 분류 (NOW / SOON / LATER)
   → necessity 필터 (ESSENTIAL / SITUATIONAL / OPTIONAL / RENT_OR_USED)
-  → sortOrder + popularityScore 기반 정렬
-  → 응답 반환
+  → finalScore 정렬
+  → 응답 반환 (reason, developStage 포함)
+
+[클라이언트]
+  추천 카드 렌더링
+  → "왜 지금?" 발달 근거 문구 표시 (reason + developStage)
+  → "바로 구매" 쿠팡 파트너스 링크 버튼 표시
 ```
+
+**발달 단계(developStage) 값 기준:**
+
+| 연령 구간 | 대표 발달 이정표 | 기준 문구 예시 |
+|---------|--------------|-------------|
+| 0-3m | 청각 반응, 수유 리듬 형성 | "신생아기: 수유 리듬이 잡히는 시기예요" |
+| 3-6m | 목 가누기, 손 뻗기 | "목을 가눌 수 있어 바운서 활용 시작" |
+| 6-12m | 앉기, 이유식 시작 | "이유식 2단계 시작, 앉기 가능" |
+| 12-18m | 서기, 첫걸음 | "걸음마 시작: 안전 환경 필요" |
+| 18-24m | 달리기, 소근육 발달 | "활발한 탐색기: 신체 놀이 필요" |
+| 24-36m | 언어 폭발, 역할 놀이 | "언어 발달 급속기: 상호작용 놀이 권장" |
 
 **추천 스코어링 공식**
 
@@ -609,30 +671,34 @@ ddokddok/
 
 ### Phase 1 — 코어 엔진 (1~2개월)
 
-| 주차 | 작업 |
-|------|------|
-| Week 1~2 | 프로젝트 셋업 (Next.js + Prisma + DB) |
-| Week 3~4 | 추천 데이터 72개 입력 (lifecycle_rules 시드) |
-| Week 5~6 | 온보딩 + 홈 대시보드 + 추천 API 연결 |
-| Week 7~8 | 모바일 반응형 QA + Vercel 배포 |
+> **v1 목표:** 생년월일 입력 → 발달 근거 추천 → 쿠팡 링크로 구매 연결까지 작동하는 최소 버전
 
-### Phase 2 — 상품 DB & 체크리스트 (3~4개월)
+| 주차 | 작업 | 산출물 |
+|------|------|--------|
+| Week 1~2 | 프로젝트 셋업 (Next.js + Prisma + DB) | 배포 가능 빈 앱 |
+| **Week 3~4** | **추천 데이터 72개 입력 (lifecycle_rules seed CSV 완성)** | **seed 파일 = 핵심 자산** |
+| Week 5~6 | 온보딩 + 홈 대시보드 + 추천 API 연결 | 추천 작동 확인 |
+| Week 7~8 | 상품 상세 + "바로 구매" 버튼 + 체크리스트 + 모바일 QA | MVP 배포 |
+
+> ⚠️ **Week 3~4 seed 데이터 입력이 가장 중요한 작업.** 이 데이터가 없으면 코드가 있어도 추천 품질이 없음. 발달이론 근거(reason + developStage) + 쿠팡 URL 포함.
+
+### Phase 2 — 상품 DB & 외부 연동 (3~4개월)
 
 | 작업 | 비고 |
 |------|------|
 | 네이버 쇼핑 API 연동 | 실시간 가격 조회 |
-| 상품 상세 페이지 완성 | 쿠팡 파트너스 링크 포함 |
+| 10개 세부 카테고리 확장 | v1의 4개 상위에서 확장 |
 | 추천 이유 문구 자동 생성 | GPT API 활용 |
-| 체크리스트 UI | 로컬스토리지 + 진행률 표시 |
+| 회원가입/로그인 + 체크리스트 서버 동기화 | Phase 2 이후 |
 
 ### Phase 3 — 고도화 (5~6개월)
 
 | 작업 | 비고 |
 |------|------|
-| SafetyKorea API 연동 | KC 인증, 리콜 배지 표시 |
-| 쇼핑인사이트 인기 랭킹 | 트렌드 스코어 갱신 |
-| 협업 필터링 PoC | 데이터 충분 시 도입 |
-| 공동구매 최적화 | 쿠팡 파트너스 타이밍 연계 |
+| SafetyKorea API 연동 | KC 인증, 리콜 자동 배지 |
+| 쇼핑인사이트 인기 랭킹 | 트렌드 스코어 실제값 |
+| 협업 필터링 PoC | MAU 1,000명 + 데이터 5,000건 이상 시 |
+| 공동구매/출산예정일 모드 검토 | 파트너십 확보 후 결정 |
 
 ### 마일스톤 & 체크포인트
 
@@ -700,7 +766,7 @@ lib/age-calculator.ts의 calcAgeMonths를 수정해줘."
 
 ---
 
-*버전 1.1 — 똑똑한 엄마 팀 (GPT 피드백 반영 수정본)*
+*버전 1.2 — 똑똑한 엄마 팀 (팀 피드백 + GPT 검토 반영)*
 
 *이 TRD는 Claude Code를 활용한 AI 주도 개발을 전제로 작성되었습니다.
 각 섹션의 코드 예시는 Claude Code에 직접 붙여넣어 구현 지시 프롬프트로 활용할 수 있습니다.*
