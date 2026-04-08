@@ -66,39 +66,31 @@ export interface MarketProduct {
 
 // 카테고리별 마켓 상품 개수 (홈 카드 뱃지용)
 export async function fetchMarketCountByCategory(): Promise<Record<string, number>> {
-  const { data, error } = await supabase
-    .from('market_products')
-    .select('category')
-  if (error || !data) return {}
-
-  const counts: Record<string, number> = {
-    feeding: 0, sleep: 0, play: 0, outdoor: 0,
-  }
-  const map: Record<string, string[]> = {
-    feeding:  ['젖병', '분유', '이유식', '수유'],
-    sleep:    ['기저귀', '손수건', '위생', '세제', '수면', '속싸개'],
-    play:     ['치발기', '장난감', '놀이', '모빌'],
-    outdoor:  ['아기띠', '유모차', '카시트'],
+  const mainCategories = ['먹기', '자기·위생', '놀기·배우기', '외출·안전']
+  const slugMap: Record<string, string> = {
+    '먹기': 'feeding', '자기·위생': 'sleep',
+    '놀기·배우기': 'play', '외출·안전': 'outdoor',
   }
 
-  for (const row of data as { category: string | null }[]) {
-    const cat = row.category ?? ''
-    for (const [slug, keywords] of Object.entries(map)) {
-      if (keywords.some((k) => cat.includes(k))) {
-        counts[slug]++
-        break
-      }
-    }
-  }
+  const counts: Record<string, number> = { feeding: 0, sleep: 0, play: 0, outdoor: 0 }
+
+  await Promise.all(mainCategories.map(async (main) => {
+    const { count } = await supabase
+      .from('market_products')
+      .select('*', { count: 'exact', head: true })
+      .eq('category_main', main)
+    counts[slugMap[main]] = count ?? 0
+  }))
+
   return counts
 }
 
-// 카테고리 슬러그 → 검색 키워드 매핑
-const CATEGORY_KEYWORDS: Record<string, string[]> = {
-  feeding:  ['젖병', '분유', '이유식', '수유', '젖꼭지'],
-  sleep:    ['기저귀', '손수건', '위생', '세제', '수면', '속싸개', '포대기'],
-  play:     ['치발기', '장난감', '놀이', '모빌'],
-  outdoor:  ['아기띠', '유모차', '카시트', '외출'],
+// 카테고리 슬러그 → 대분류 매핑
+const SLUG_TO_MAIN: Record<string, string> = {
+  feeding: '먹기',
+  sleep:   '자기·위생',
+  play:    '놀기·배우기',
+  outdoor: '외출·안전',
 }
 
 export async function fetchMarketProducts(
@@ -106,27 +98,21 @@ export async function fetchMarketProducts(
   productName: string,
   limit = 8
 ): Promise<MarketProduct[]> {
-  const keywords = CATEGORY_KEYWORDS[categorySlug] ?? []
-  // 제품명 첫 단어도 키워드로 추가
-  const nameWord = productName.split(/[\s·,]/)[0]
-  if (nameWord && !keywords.includes(nameWord)) keywords.push(nameWord)
+  const categoryMain = SLUG_TO_MAIN[categorySlug]
 
-  if (keywords.length === 0) return []
-
-  // OR 조건으로 name 또는 category에 키워드 포함
-  const orFilter = keywords
-    .map((k) => `name.ilike.%${k}%,category.ilike.%${k}%`)
-    .join(',')
-
-  const { data, error } = await supabase
+  let query = supabase
     .from('market_products')
     .select('*')
-    .or(orFilter)
     .not('thumbnail_url', 'is', null)
-    .not('detail_url', 'eq', '')
-    .order('review_count', { ascending: false })
+    .not('detail_url', 'is', null)
+    .order('review_count', { ascending: false, nullsFirst: false })
     .limit(limit)
 
+  if (categoryMain) {
+    query = query.eq('category_main', categoryMain)
+  }
+
+  const { data, error } = await query
   if (error) return []
   return data as MarketProduct[]
 }
