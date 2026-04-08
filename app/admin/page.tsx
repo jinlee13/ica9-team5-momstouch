@@ -2,6 +2,15 @@
 
 import { useState, useEffect, useCallback } from 'react'
 
+type AnalyticsData = {
+  summary: { total_views: number; total_clicks: number; total_checklist: number; unique_sessions: number }
+  topViewed: { id: string; name: string; count: number; category: string }[]
+  topClicked: { id: string; name: string; count: number; productName: string }[]
+  topChecklist: { id: string; name: string; BOUGHT: number; PENDING: number; SKIP: number; total: number }[]
+  catMap: Record<string, number>
+  daily: [string, number][]
+}
+
 const CATEGORIES = [
   { value: 'sleep',   label: '자기·위생' },
   { value: 'feeding', label: '먹기' },
@@ -38,6 +47,10 @@ export default function AdminPage() {
   const [form, setForm] = useState(EMPTY_FORM)
   const [saving, setSaving] = useState(false)
   const [toast, setToast] = useState('')
+  const [activeTab, setActiveTab] = useState<'products' | 'analytics'>('products')
+  const [analytics, setAnalytics] = useState<AnalyticsData | null>(null)
+  const [analyticsDays, setAnalyticsDays] = useState(7)
+  const [analyticsLoading, setAnalyticsLoading] = useState(false)
 
   const showToast = (msg: string) => {
     setToast(msg)
@@ -121,6 +134,19 @@ export default function AdminPage() {
     if (res.ok) { showToast('🗑️ 삭제 완료'); loadProducts(password) }
   }
 
+  const loadAnalytics = useCallback(async (pw: string, days: number) => {
+    setAnalyticsLoading(true)
+    const res = await fetch(`/api/admin/analytics?days=${days}`, {
+      headers: { 'x-admin-password': pw }
+    })
+    if (res.ok) setAnalytics(await res.json())
+    setAnalyticsLoading(false)
+  }, [])
+
+  useEffect(() => {
+    if (authed && activeTab === 'analytics') loadAnalytics(password, analyticsDays)
+  }, [authed, activeTab, analyticsDays, loadAnalytics, password])
+
   const filtered = products.filter((p) => {
     if (filterCat !== 'all' && p.category_slug !== filterCat) return false
     if (search && !p.name.toLowerCase().includes(search.toLowerCase())) return false
@@ -172,6 +198,15 @@ export default function AdminPage() {
           <div className="flex items-center gap-3">
             <span className="text-xl font-black" style={{ color: '#9B7EDE' }}>똑똑한 엄마</span>
             <span className="text-xs px-2 py-1 rounded-full bg-purple-100 text-purple-700 font-bold">관리자</span>
+            <div className="flex gap-1 ml-2">
+              {(['products', 'analytics'] as const).map((tab) => (
+                <button key={tab} onClick={() => setActiveTab(tab)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${activeTab === tab ? 'text-white' : 'text-gray-400 hover:text-gray-600'}`}
+                  style={activeTab === tab ? { background: 'linear-gradient(to right, #9B7EDE, #B794F6)' } : {}}>
+                  {tab === 'products' ? '📦 제품 관리' : '📊 분석'}
+                </button>
+              ))}
+            </div>
           </div>
           <div className="flex items-center gap-3">
             <span className="text-sm text-gray-400 hidden sm:block">총 {products.length}개 제품</span>
@@ -189,6 +224,163 @@ export default function AdminPage() {
       </header>
 
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-6">
+
+        {/* ── 분석 탭 ── */}
+        {activeTab === 'analytics' && (
+          <div>
+            {/* 기간 선택 */}
+            <div className="flex items-center gap-2 mb-6">
+              <span className="text-sm font-bold text-gray-600">기간:</span>
+              {[7, 14, 30].map((d) => (
+                <button key={d} onClick={() => setAnalyticsDays(d)}
+                  className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-all ${analyticsDays === d ? 'text-white' : 'bg-white text-gray-500 border border-gray-200'}`}
+                  style={analyticsDays === d ? { background: 'linear-gradient(to right, #9B7EDE, #B794F6)' } : {}}>
+                  최근 {d}일
+                </button>
+              ))}
+              <button onClick={() => loadAnalytics(password, analyticsDays)}
+                className="ml-2 px-3 py-1.5 rounded-full text-sm border border-gray-200 text-gray-500 hover:border-purple-300">
+                새로고침
+              </button>
+            </div>
+
+            {analyticsLoading ? (
+              <div className="text-center py-20 text-gray-400">데이터 불러오는 중...</div>
+            ) : !analytics ? (
+              <div className="text-center py-20 text-gray-400">데이터 없음</div>
+            ) : (
+              <div className="space-y-6">
+                {/* 요약 카드 */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {[
+                    { label: '총 제품 조회', value: analytics.summary.total_views, emoji: '👁️' },
+                    { label: '구매 링크 클릭', value: analytics.summary.total_clicks, emoji: '🛒' },
+                    { label: '체크리스트 액션', value: analytics.summary.total_checklist, emoji: '✅' },
+                    { label: '방문 세션', value: analytics.summary.unique_sessions, emoji: '👤' },
+                  ].map((s) => (
+                    <div key={s.label} className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm text-center">
+                      <div className="text-2xl mb-1">{s.emoji}</div>
+                      <div className="text-3xl font-black" style={{ color: '#9B7EDE' }}>{s.value}</div>
+                      <div className="text-xs text-gray-400 mt-1">{s.label}</div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-6">
+                  {/* 많이 본 제품 TOP 10 */}
+                  <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+                    <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
+                      <span>👁️</span> 많이 본 제품 TOP 10
+                    </h3>
+                    {analytics.topViewed.length === 0 ? (
+                      <p className="text-gray-400 text-sm text-center py-8">데이터 없음</p>
+                    ) : (
+                      <div className="space-y-2">
+                        {analytics.topViewed.map((p, i) => (
+                          <div key={p.id} className="flex items-center gap-3">
+                            <span className="w-6 h-6 rounded-full bg-purple-100 text-purple-700 text-xs font-black flex items-center justify-center flex-shrink-0">{i + 1}</span>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-semibold text-gray-800 truncate">{p.name}</p>
+                              <p className="text-xs text-gray-400">{p.category}</p>
+                            </div>
+                            <span className="text-sm font-bold text-purple-600">{p.count}회</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* 구매 클릭 TOP 10 */}
+                  <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+                    <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
+                      <span>🛒</span> 구매 클릭 많은 상품 TOP 10
+                    </h3>
+                    {analytics.topClicked.length === 0 ? (
+                      <p className="text-gray-400 text-sm text-center py-8">데이터 없음</p>
+                    ) : (
+                      <div className="space-y-2">
+                        {analytics.topClicked.map((p, i) => (
+                          <div key={p.id} className="flex items-center gap-3">
+                            <span className="w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-xs font-black flex items-center justify-center flex-shrink-0">{i + 1}</span>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-semibold text-gray-800 truncate">{p.name}</p>
+                              <p className="text-xs text-gray-400">{p.productName} 에서</p>
+                            </div>
+                            <span className="text-sm font-bold text-blue-600">{p.count}회</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* 체크리스트 완료 TOP */}
+                  <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+                    <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
+                      <span>✅</span> 체크리스트 많이 담은 제품
+                    </h3>
+                    {analytics.topChecklist.length === 0 ? (
+                      <p className="text-gray-400 text-sm text-center py-8">데이터 없음</p>
+                    ) : (
+                      <div className="space-y-2">
+                        {analytics.topChecklist.map((p, i) => (
+                          <div key={p.id} className="flex items-center gap-3">
+                            <span className="w-6 h-6 rounded-full bg-green-100 text-green-700 text-xs font-black flex items-center justify-center flex-shrink-0">{i + 1}</span>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-semibold text-gray-800 truncate">{p.name}</p>
+                              <div className="flex gap-2 mt-0.5">
+                                <span className="text-xs text-green-600">✅ {p.BOUGHT}</span>
+                                <span className="text-xs text-yellow-600">⏳ {p.PENDING}</span>
+                                <span className="text-xs text-red-400">🚫 {p.SKIP}</span>
+                              </div>
+                            </div>
+                            <span className="text-sm font-bold text-green-600">{p.total}회</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* 카테고리별 관심도 */}
+                  <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+                    <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
+                      <span>📂</span> 카테고리별 관심도
+                    </h3>
+                    {Object.keys(analytics.catMap).length === 0 ? (
+                      <p className="text-gray-400 text-sm text-center py-8">데이터 없음</p>
+                    ) : (() => {
+                      const total = Object.values(analytics.catMap).reduce((a, b) => a + b, 0)
+                      const colors: Record<string, string> = {
+                        '먹기': '#F59E0B', '자기·위생': '#8B5CF6',
+                        '놀기·배우기': '#10B981', '외출·안전': '#3B82F6',
+                      }
+                      return (
+                        <div className="space-y-3">
+                          {Object.entries(analytics.catMap)
+                            .sort(([,a],[,b]) => b - a)
+                            .map(([cat, count]) => (
+                              <div key={cat}>
+                                <div className="flex justify-between text-sm mb-1">
+                                  <span className="font-medium text-gray-700">{cat}</span>
+                                  <span className="text-gray-500">{count}회 ({Math.round(count/total*100)}%)</span>
+                                </div>
+                                <div className="w-full bg-gray-100 rounded-full h-2">
+                                  <div className="h-2 rounded-full transition-all"
+                                    style={{ width: `${Math.round(count/total*100)}%`, background: colors[cat] ?? '#9B7EDE' }} />
+                                </div>
+                              </div>
+                          ))}
+                        </div>
+                      )
+                    })()}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── 제품 관리 탭 ── */}
+        {activeTab === 'products' && <>
         {/* 검색/필터 */}
         <div className="flex flex-col sm:flex-row gap-3 mb-6">
           <input
@@ -268,6 +460,7 @@ export default function AdminPage() {
             )}
           </div>
         </div>
+        </>}
       </div>
 
       {/* 추가/수정 모달 */}

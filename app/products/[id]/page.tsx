@@ -12,6 +12,7 @@ import {
   type Product,
 } from '@/lib/recommendations'
 import { fetchProductById, fetchDdokFramework, fetchMarketProducts, type MarketProduct } from '@/lib/supabase-queries'
+import { trackProductView, trackMarketClick, trackChecklist } from '@/lib/analytics'
 
 export default function ProductDetailPage({ params }: { params: { id: string } }) {
   const router = useRouter()
@@ -31,6 +32,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
         const months = calculateAgeInMonths(birthdate)
         fetchDdokFramework(months).then(setDdok)
         fetchMarketProducts(p.categorySlug, params.id).then(setMarketProducts)
+        trackProductView(params.id, p.name, p.categoryName)
       }
     })
   }, [params.id, router])
@@ -42,6 +44,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
     else delete next[params.id]
     localStorage.setItem('ddokddok_checklist', JSON.stringify(next))
     setStatus(newStatus)
+    if (product && newStatus) trackChecklist(params.id, product.name, newStatus)
   }
 
   if (!product) {
@@ -204,6 +207,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
                         href={mp.detail_url ?? '#'}
                         target="_blank"
                         rel="noopener noreferrer"
+                        onClick={() => product && trackMarketClick(params.id, product.name, mp.id, mp.name, product.categoryName)}
                         className="flex items-center gap-3 p-2.5 rounded-xl border border-gray-100 hover:border-purple-200 hover:bg-purple-50 transition-all group"
                       >
                         {mp.thumbnail_url ? (
