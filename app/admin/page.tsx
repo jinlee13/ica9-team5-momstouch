@@ -35,6 +35,23 @@ const EMPTY_FORM = {
 
 type Product = typeof EMPTY_FORM & { id: string }
 
+type MarketRow = {
+  id: number
+  name: string
+  brand: string | null
+  price: string | null
+  original_price: string | null
+  category_main: string | null
+  category_mid: string | null
+  category_sub: string | null
+  thumbnail_url: string | null
+  detail_url: string | null
+  rating: number | null
+  review_count: number | null
+  age_recommendation: string | null
+  source_site: string | null
+}
+
 export default function AdminPage() {
   const [password, setPassword] = useState('')
   const [authed, setAuthed] = useState(false)
@@ -47,10 +64,16 @@ export default function AdminPage() {
   const [form, setForm] = useState(EMPTY_FORM)
   const [saving, setSaving] = useState(false)
   const [toast, setToast] = useState('')
-  const [activeTab, setActiveTab] = useState<'products' | 'analytics'>('products')
+  const [activeTab, setActiveTab] = useState<'products' | 'market' | 'analytics'>('products')
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null)
   const [analyticsDays, setAnalyticsDays] = useState(7)
   const [analyticsLoading, setAnalyticsLoading] = useState(false)
+  const [marketProducts, setMarketProducts] = useState<MarketRow[]>([])
+  const [marketSearch, setMarketSearch] = useState('')
+  const [marketMainFilter, setMarketMainFilter] = useState('전체')
+  const [marketPage, setMarketPage] = useState(0)
+  const [marketTotal, setMarketTotal] = useState(0)
+  const [marketLoading, setMarketLoading] = useState(false)
 
   const showToast = (msg: string) => {
     setToast(msg)
@@ -134,6 +157,29 @@ export default function AdminPage() {
     if (res.ok) { showToast('🗑️ 삭제 완료'); loadProducts(password) }
   }
 
+  const PAGE_SIZE = 50
+
+  const loadMarket = useCallback(async (pw: string, pg: number, main: string, search: string) => {
+    setMarketLoading(true)
+    const params = new URLSearchParams({
+      page: String(pg),
+      pageSize: String(PAGE_SIZE),
+      ...(main !== '전체' ? { main } : {}),
+      ...(search ? { search } : {}),
+    })
+    const res = await fetch(`/api/admin/market?${params}`, { headers: { 'x-admin-password': pw } })
+    if (res.ok) {
+      const json = await res.json()
+      setMarketProducts(json.data)
+      setMarketTotal(json.total)
+    }
+    setMarketLoading(false)
+  }, [])
+
+  useEffect(() => {
+    if (authed && activeTab === 'market') loadMarket(password, marketPage, marketMainFilter, marketSearch)
+  }, [authed, activeTab, marketPage, marketMainFilter, marketSearch, loadMarket, password])
+
   const loadAnalytics = useCallback(async (pw: string, days: number) => {
     setAnalyticsLoading(true)
     const res = await fetch(`/api/admin/analytics?days=${days}`, {
@@ -199,11 +245,11 @@ export default function AdminPage() {
             <span className="text-xl font-black" style={{ color: '#9B7EDE' }}>똑똑한 엄마</span>
             <span className="text-xs px-2 py-1 rounded-full bg-purple-100 text-purple-700 font-bold">관리자</span>
             <div className="flex gap-1 ml-2">
-              {(['products', 'analytics'] as const).map((tab) => (
+              {([['products','📦 추천 제품'], ['market','🛒 수집 데이터'], ['analytics','📊 분석']] as const).map(([tab, label]) => (
                 <button key={tab} onClick={() => setActiveTab(tab)}
                   className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${activeTab === tab ? 'text-white' : 'text-gray-400 hover:text-gray-600'}`}
                   style={activeTab === tab ? { background: 'linear-gradient(to right, #9B7EDE, #B794F6)' } : {}}>
-                  {tab === 'products' ? '📦 제품 관리' : '📊 분석'}
+                  {label}
                 </button>
               ))}
             </div>
@@ -224,6 +270,105 @@ export default function AdminPage() {
       </header>
 
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-6">
+
+        {/* ── 수집 데이터 탭 ── */}
+        {activeTab === 'market' && (
+          <div>
+            {/* 필터 */}
+            <div className="flex flex-col sm:flex-row gap-3 mb-4">
+              <input
+                value={marketSearch}
+                onChange={(e) => { setMarketSearch(e.target.value); setMarketPage(0) }}
+                placeholder="제품명 검색..."
+                className="flex-1 px-4 py-2.5 rounded-xl border-2 border-gray-200 focus:border-purple-400 focus:outline-none text-sm"
+              />
+              <div className="flex gap-2 flex-wrap">
+                {['전체', '먹기', '자기·위생', '놀기·배우기', '외출·안전'].map((m) => (
+                  <button key={m} onClick={() => { setMarketMainFilter(m); setMarketPage(0) }}
+                    className={`px-3 py-2 rounded-xl text-sm font-semibold transition-all ${marketMainFilter === m ? 'text-white shadow-md' : 'bg-white text-gray-500 border border-gray-200'}`}
+                    style={marketMainFilter === m ? { background: 'linear-gradient(to right, #9B7EDE, #B794F6)' } : {}}>
+                    {m}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="text-sm text-gray-400 mb-3">총 {marketTotal.toLocaleString()}개 제품 · {marketPage + 1}페이지</div>
+
+            {marketLoading ? (
+              <div className="text-center py-20 text-gray-400">불러오는 중...</div>
+            ) : (
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead className="bg-gray-50 border-b border-gray-100">
+                      <tr>
+                        <th className="text-left px-4 py-3 text-xs font-bold text-gray-500 w-16">썸네일</th>
+                        <th className="text-left px-4 py-3 text-xs font-bold text-gray-500">제품명</th>
+                        <th className="text-left px-4 py-3 text-xs font-bold text-gray-500">브랜드</th>
+                        <th className="text-left px-4 py-3 text-xs font-bold text-gray-500">가격</th>
+                        <th className="text-left px-4 py-3 text-xs font-bold text-gray-500">대분류</th>
+                        <th className="text-left px-4 py-3 text-xs font-bold text-gray-500">중분류</th>
+                        <th className="text-left px-4 py-3 text-xs font-bold text-gray-500">소분류</th>
+                        <th className="text-left px-4 py-3 text-xs font-bold text-gray-500">권장연령</th>
+                        <th className="text-left px-4 py-3 text-xs font-bold text-gray-500">평점</th>
+                        <th className="text-left px-4 py-3 text-xs font-bold text-gray-500">출처</th>
+                        <th className="text-left px-4 py-3 text-xs font-bold text-gray-500">링크</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-50">
+                      {marketProducts.map((p) => (
+                        <tr key={p.id} className="hover:bg-gray-50 transition-colors">
+                          <td className="px-4 py-3">
+                            {p.thumbnail_url
+                              ? <img src={p.thumbnail_url} alt="" className="w-12 h-12 rounded-lg object-cover bg-gray-100" onError={(e) => { (e.target as HTMLImageElement).style.display='none' }} />
+                              : <div className="w-12 h-12 rounded-lg bg-gray-100" />}
+                          </td>
+                          <td className="px-4 py-3 max-w-xs">
+                            <p className="font-semibold text-gray-800 line-clamp-2 text-xs leading-snug">{p.name}</p>
+                          </td>
+                          <td className="px-4 py-3 text-xs text-gray-500 whitespace-nowrap">{p.brand ?? '-'}</td>
+                          <td className="px-4 py-3 text-xs font-bold text-purple-600 whitespace-nowrap">{p.price ?? '-'}</td>
+                          <td className="px-4 py-3"><span className="text-xs px-2 py-1 rounded-full bg-purple-50 text-purple-700 font-semibold whitespace-nowrap">{p.category_main ?? '-'}</span></td>
+                          <td className="px-4 py-3 text-xs text-gray-500 whitespace-nowrap">{p.category_mid ?? '-'}</td>
+                          <td className="px-4 py-3 text-xs text-gray-500 whitespace-nowrap">{p.category_sub ?? '-'}</td>
+                          <td className="px-4 py-3 text-xs text-gray-400 whitespace-nowrap">{p.age_recommendation ?? '-'}</td>
+                          <td className="px-4 py-3 text-xs text-gray-400 whitespace-nowrap">
+                            {p.rating ? `⭐ ${p.rating}` : '-'}
+                            {p.review_count ? ` (${p.review_count})` : ''}
+                          </td>
+                          <td className="px-4 py-3 text-xs text-gray-400 whitespace-nowrap">{p.source_site ?? '-'}</td>
+                          <td className="px-4 py-3">
+                            {p.detail_url && (
+                              <a href={p.detail_url} target="_blank" rel="noopener noreferrer"
+                                className="text-xs text-purple-500 hover:underline whitespace-nowrap">보기 →</a>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  {marketProducts.length === 0 && (
+                    <div className="py-16 text-center text-gray-400">데이터 없음</div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* 페이지네이션 */}
+            <div className="flex items-center justify-center gap-3 mt-4">
+              <button onClick={() => setMarketPage(p => Math.max(0, p-1))} disabled={marketPage === 0 || marketLoading}
+                className="px-4 py-2 rounded-xl border border-gray-200 text-sm font-semibold text-gray-600 disabled:opacity-40 hover:border-purple-300">
+                ← 이전
+              </button>
+              <span className="text-sm text-gray-500">{marketPage + 1} / {Math.ceil(marketTotal / PAGE_SIZE) || 1}</span>
+              <button onClick={() => setMarketPage(p => p+1)} disabled={(marketPage + 1) * PAGE_SIZE >= marketTotal || marketLoading}
+                className="px-4 py-2 rounded-xl border border-gray-200 text-sm font-semibold text-gray-600 disabled:opacity-40 hover:border-purple-300">
+                다음 →
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* ── 분석 탭 ── */}
         {activeTab === 'analytics' && (
