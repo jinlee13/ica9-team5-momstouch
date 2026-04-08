@@ -100,21 +100,60 @@ export async function fetchMarketProducts(
 ): Promise<MarketProduct[]> {
   const categoryMain = SLUG_TO_MAIN[categorySlug]
 
-  let query = supabase
+  // 제품명에서 핵심 키워드 추출 (괄호 제거, 첫 2단어)
+  const keywords = productName
+    .replace(/\(.*?\)/g, '')
+    .split(/[\s·,\/]+/)
+    .filter((w) => w.length >= 2)
+    .slice(0, 3)
+
+  // 1차: 제품명 키워드로 name 검색
+  if (keywords.length > 0) {
+    const orFilter = keywords.map((k) => `name.ilike.%${k}%`).join(',')
+    const { data } = await supabase
+      .from('market_products')
+      .select('*')
+      .not('thumbnail_url', 'is', null)
+      .not('detail_url', 'is', null)
+      .or(orFilter)
+      .order('review_count', { ascending: false, nullsFirst: false })
+      .limit(limit)
+
+    if (data && data.length > 0) return data as MarketProduct[]
+  }
+
+  // 2차: 키워드 매칭 없으면 중분류로 검색
+  const subMap: Record<string, string> = {
+    feeding: '젖병·수유용품',
+    sleep:   '수면용품',
+    play:    '치발기·완구',
+    outdoor: '외출용품',
+  }
+  const categoryMid = subMap[categorySlug]
+
+  const { data } = await supabase
     .from('market_products')
     .select('*')
     .not('thumbnail_url', 'is', null)
     .not('detail_url', 'is', null)
+    .eq('category_main', categoryMain ?? '')
+    .eq('category_mid', categoryMid ?? '')
     .order('review_count', { ascending: false, nullsFirst: false })
     .limit(limit)
 
-  if (categoryMain) {
-    query = query.eq('category_main', categoryMain)
-  }
+  if (data && data.length > 0) return data as MarketProduct[]
 
-  const { data, error } = await query
-  if (error) return []
-  return data as MarketProduct[]
+  // 3차: 대분류만으로 검색
+  const { data: fallback } = await supabase
+    .from('market_products')
+    .select('*')
+    .not('thumbnail_url', 'is', null)
+    .not('detail_url', 'is', null)
+    .eq('category_main', categoryMain ?? '')
+    .order('review_count', { ascending: false, nullsFirst: false })
+    .limit(limit)
+
+  return (fallback ?? []) as MarketProduct[]
 }
 
 export async function fetchDdokFramework(ageMonths: number) {
