@@ -23,6 +23,33 @@ function mapProduct(row: Record<string, unknown>): Product {
   }
 }
 
+export async function fetchMarketProductsByCat(
+  main: string,
+  mid?: string,
+  sub?: string,
+  page = 0,
+  pageSize = 24
+): Promise<{ data: MarketProduct[]; hasMore: boolean }> {
+  let query = supabase
+    .from('market_products')
+    .select('*')
+    .eq('category_main', main)
+
+  if (mid) query = query.eq('category_mid', mid)
+  if (sub) query = query.eq('category_sub', sub)
+
+  const { data, error } = await query
+    .not('thumbnail_url', 'is', null)
+    .order('review_count', { ascending: false, nullsFirst: false })
+    .range(page * pageSize, (page + 1) * pageSize)
+
+  if (error) return { data: [], hasMore: false }
+  return {
+    data: (data ?? []) as MarketProduct[],
+    hasMore: (data?.length ?? 0) > pageSize,
+  }
+}
+
 export async function fetchRecommendations(ageMonths: number): Promise<ProductWithPriority[]> {
   const { data, error } = await supabase.from('products').select('*')
   if (error) throw error
@@ -56,11 +83,16 @@ export interface MarketProduct {
   name: string
   brand: string | null
   price: string | null
+  original_price: string | null
   category: string | null
+  category_main: string | null
+  category_mid: string | null
+  category_sub: string | null
   thumbnail_url: string | null
   detail_url: string | null
   rating: number | null
   review_count: number | null
+  age_recommendation: string | null
   source_site: string | null
 }
 
