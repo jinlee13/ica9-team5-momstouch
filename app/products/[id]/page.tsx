@@ -4,25 +4,35 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import {
-  getProductById,
-  getAgeGroupForMonths,
-  getDdokFramework,
   calculateAgeInMonths,
   NECESSITY_LABELS,
   CATEGORY_INFO,
   DDOK_PILLAR_LABELS,
   type TopProduct,
+  type Product,
 } from '@/lib/recommendations'
+import { fetchProductById, fetchDdokFramework, fetchMarketProducts, type MarketProduct } from '@/lib/supabase-queries'
 
 export default function ProductDetailPage({ params }: { params: { id: string } }) {
   const router = useRouter()
   const [status, setStatus] = useState<string>('')
+  const [product, setProduct] = useState<Product | null>(null)
+  const [ddok, setDdok] = useState<{ label: string; subtitle: string; reason_template: string } | null>(null)
+  const [marketProducts, setMarketProducts] = useState<MarketProduct[]>([])
 
   useEffect(() => {
     const birthdate = localStorage.getItem('ddokddok_birthdate')
     if (!birthdate) { router.push('/'); return }
     const cl = localStorage.getItem('ddokddok_checklist')
     if (cl) setStatus(JSON.parse(cl)[params.id] ?? '')
+    fetchProductById(params.id).then((p) => {
+      setProduct(p)
+      if (p) {
+        const months = calculateAgeInMonths(birthdate)
+        fetchDdokFramework(months).then(setDdok)
+        fetchMarketProducts(p.categorySlug, p.name).then(setMarketProducts)
+      }
+    })
   }, [params.id, router])
 
   function updateStatus(newStatus: string) {
@@ -34,13 +44,11 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
     setStatus(newStatus)
   }
 
-  const product = getProductById(params.id)
-
   if (!product) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-gray-50">
         <div className="text-5xl">😕</div>
-        <p className="text-gray-600 font-medium text-lg">상품을 찾을 수 없어요</p>
+        <p className="text-gray-600 font-medium text-lg">불러오는 중...</p>
         <Link href="/home" className="px-6 py-3 rounded-2xl text-white font-semibold"
               style={{ background: 'linear-gradient(to right, #9B7EDE, #B794F6)' }}>
           홈으로 돌아가기
@@ -51,8 +59,6 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
 
   const necessity = NECESSITY_LABELS[product.necessity]
   const category = CATEGORY_INFO[product.categorySlug]
-  const ageGroupSlug = getAgeGroupForMonths(product.ageMinMonths)
-  const ddok = getDdokFramework(ageGroupSlug)
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -73,10 +79,10 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
         </div>
       </nav>
 
-      <div className="max-w-5xl mx-auto px-6 py-10">
-        <div className="grid md:grid-cols-5 gap-8">
+      <div className="max-w-5xl mx-auto px-4 md:px-6 py-6 md:py-10">
+        <div className="grid md:grid-cols-5 gap-6 md:gap-8">
           {/* Left — Main Info */}
-          <div className="md:col-span-3 space-y-6">
+          <div className="md:col-span-3 space-y-5 md:space-y-6 order-2 md:order-1">
             {/* Product Header */}
             <div className="bg-white rounded-3xl p-7 border-2 border-gray-100 shadow-sm">
               <div className="flex items-center gap-4 mb-5">
@@ -171,9 +177,9 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
           </div>
 
           {/* Right — Sidebar */}
-          <div className="md:col-span-2 space-y-5">
+          <div className="md:col-span-2 space-y-5 order-1 md:order-2">
             {/* Buy Card */}
-            <div className="bg-white rounded-3xl p-6 border-2 border-purple-100 shadow-lg sticky top-24">
+            <div className="bg-white rounded-3xl p-6 border-2 border-purple-100 shadow-lg md:sticky md:top-24">
               <div className="grid grid-cols-2 gap-3 mb-5">
                 <div className="bg-gray-50 rounded-2xl p-4 text-center">
                   <p className="text-xs text-gray-400 mb-1">가격대</p>
@@ -187,10 +193,56 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
                 </div>
               </div>
 
-              {/* Buy Link */}
-              <div className="w-full py-4 rounded-2xl bg-gray-100 text-gray-400 font-medium text-base text-center mb-3">
-                🔗 구매 링크 준비 중
-              </div>
+              {/* Buy Link — market products */}
+              {marketProducts.length > 0 ? (
+                <div className="mb-3">
+                  <p className="text-xs text-gray-400 font-medium mb-2 text-center">지금 살 수 있는 제품 {marketProducts.length}개</p>
+                  <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
+                    {marketProducts.map((mp) => (
+                      <a
+                        key={mp.id}
+                        href={mp.detail_url ?? '#'}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-3 p-2.5 rounded-xl border border-gray-100 hover:border-purple-200 hover:bg-purple-50 transition-all group"
+                      >
+                        {mp.thumbnail_url ? (
+                          <img
+                            src={mp.thumbnail_url}
+                            alt={mp.name}
+                            className="w-12 h-12 rounded-lg object-cover flex-shrink-0 bg-gray-100"
+                            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
+                          />
+                        ) : (
+                          <div className="w-12 h-12 rounded-lg bg-gray-100 flex-shrink-0" />
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-semibold text-gray-800 line-clamp-2 leading-snug group-hover:text-purple-700">
+                            {mp.name}
+                          </p>
+                          <div className="flex items-center gap-2 mt-0.5">
+                            <span className="text-xs font-bold text-purple-600">{mp.price}</span>
+                            {mp.rating && (
+                              <span className="text-xs text-gray-400">⭐ {mp.rating}</span>
+                            )}
+                            {mp.review_count && mp.review_count > 0 ? (
+                              <span className="text-xs text-gray-400">리뷰 {mp.review_count.toLocaleString()}</span>
+                            ) : null}
+                          </div>
+                          {mp.brand && (
+                            <p className="text-xs text-gray-400 truncate">{mp.brand}</p>
+                          )}
+                        </div>
+                        <span className="text-xs text-gray-300 group-hover:text-purple-400 flex-shrink-0">→</span>
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="w-full py-4 rounded-2xl bg-gray-100 text-gray-400 font-medium text-base text-center mb-3">
+                  🔗 구매 링크 준비 중
+                </div>
+              )}
 
               {/* Checklist */}
               <p className="text-xs text-gray-400 text-center mb-3 font-medium">구매 현황 관리</p>

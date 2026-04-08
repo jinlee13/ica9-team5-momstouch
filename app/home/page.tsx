@@ -6,14 +6,13 @@ import Link from 'next/link'
 import {
   calculateAgeInMonths,
   getAgeLabel,
-  getRecommendations,
   getAgeGroupForMonths,
-  getDdokFramework,
   NECESSITY_LABELS,
   CATEGORY_INFO,
   type ProductWithPriority,
   type Priority,
 } from '@/lib/recommendations'
+import { fetchRecommendations, fetchDdokFramework, fetchMarketCountByCategory } from '@/lib/supabase-queries'
 
 const PRIORITY_TABS: { key: Priority; label: string; emoji: string; desc: string }[] = [
   { key: 'NOW', label: '지금 필요', emoji: '🔥', desc: '현재 개월 수에 딱 맞는 아이템' },
@@ -37,6 +36,8 @@ export default function HomePage() {
   const [activeCategory, setActiveCategory] = useState('all')
   const [products, setProducts] = useState<ProductWithPriority[]>([])
   const [checklistState, setChecklistState] = useState<Record<string, string>>({})
+  const [ddok, setDdok] = useState<{ label: string; subtitle: string; reason_template: string } | null>(null)
+  const [marketCounts, setMarketCounts] = useState<Record<string, number>>({})
 
   useEffect(() => {
     const saved = localStorage.getItem('ddokddok_birthdate')
@@ -44,9 +45,11 @@ export default function HomePage() {
     setBirthdate(saved)
     const months = calculateAgeInMonths(saved)
     setAgeMonths(months)
-    setProducts(getRecommendations(months))
     const cl = localStorage.getItem('ddokddok_checklist')
     if (cl) setChecklistState(JSON.parse(cl))
+    fetchRecommendations(months).then(setProducts)
+    fetchDdokFramework(months).then(setDdok)
+    fetchMarketCountByCategory().then(setMarketCounts)
   }, [router])
 
   const filtered = products.filter((p) => {
@@ -57,8 +60,7 @@ export default function HomePage() {
 
   const nowCount = products.filter((p) => p.priority === 'NOW').length
   const boughtCount = Object.values(checklistState).filter((v) => v === 'BOUGHT').length
-  const ageGroupSlug = getAgeGroupForMonths(ageMonths)
-  const ddok = getDdokFramework(ageGroupSlug)
+  const soonProducts = products.filter((p) => p.priority === 'SOON').slice(0, 3)
 
   if (!birthdate) return null
 
@@ -68,18 +70,24 @@ export default function HomePage() {
       <nav className="border-b border-gray-100 bg-white sticky top-0 z-50 shadow-sm">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/" className="text-xl font-bold" style={{ color: '#9B7EDE' }}>똑똑한 엄마</Link>
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-500">
+          <div className="flex items-center gap-2 md:gap-4">
+            <span className="hidden sm:block text-sm text-gray-500">
               우리 아이: <strong className="text-gray-800">{getAgeLabel(ageMonths)}</strong>
             </span>
+            <span className="sm:hidden text-sm font-bold" style={{ color: '#9B7EDE' }}>{getAgeLabel(ageMonths)}</span>
+            <Link href="/guide"
+                  className="hidden sm:block text-sm font-semibold px-4 py-2 rounded-full border-2 border-amber-200 text-amber-700 hover:bg-amber-50 transition-colors">
+              📅 준비 가이드
+            </Link>
             <Link href="/checklist"
-                  className="text-sm font-semibold px-4 py-2 rounded-full border-2 border-purple-200 text-purple-600 hover:bg-purple-50 transition-colors">
-              ✅ 체크리스트
+                  className="text-sm font-semibold px-3 md:px-4 py-2 rounded-full border-2 border-purple-200 text-purple-600 hover:bg-purple-50 transition-colors">
+              ✅ <span className="hidden sm:inline">체크리스트</span>
             </Link>
             <button
               onClick={() => { localStorage.removeItem('ddokddok_birthdate'); router.push('/') }}
-              className="text-xs text-gray-400 hover:text-gray-600 border border-gray-200 rounded-full px-3 py-1.5 transition-colors">
-              생년월일 변경
+              className="text-xs text-gray-400 hover:text-gray-600 border border-gray-200 rounded-full px-2 md:px-3 py-1.5 transition-colors">
+              <span className="hidden sm:inline">생년월일 변경</span>
+              <span className="sm:hidden">변경</span>
             </button>
           </div>
         </div>
@@ -128,8 +136,43 @@ export default function HomePage() {
           </div>
         </div>
 
+        {/* Soon Banner */}
+        {soonProducts.length > 0 && (
+          <div className="mb-6 rounded-2xl border-2 border-amber-200 bg-amber-50 p-4 md:p-5">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <span className="text-xl">⏰</span>
+                <span className="font-bold text-amber-800 text-sm md:text-base">곧 필요해요 — 미리 준비하세요!</span>
+              </div>
+              <button
+                onClick={() => setActiveTab('SOON')}
+                className="text-xs font-semibold text-amber-700 hover:text-amber-900 transition-colors underline underline-offset-2">
+                전체 보기 →
+              </button>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              {soonProducts.map((p) => {
+                const monthsUntil = p.ageMinMonths - ageMonths
+                return (
+                  <Link key={p.id} href={`/products/${p.id}`}
+                        className="flex items-center gap-3 bg-white rounded-xl p-3 border border-amber-100 hover:border-amber-300 transition-all">
+                    <div className="flex-shrink-0 w-10 h-10 rounded-xl flex flex-col items-center justify-center bg-amber-100">
+                      <span className="text-xs font-black text-amber-700">{monthsUntil}m</span>
+                      <span className="text-xs text-amber-500">후</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-gray-800 truncate">{p.name}</p>
+                      <p className="text-xs text-gray-400">{p.priceRange}</p>
+                    </div>
+                  </Link>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
         {/* Priority Tabs */}
-        <div className="flex gap-3 mb-6 flex-wrap">
+        <div className="flex gap-3 mb-6 overflow-x-auto pb-1 -mx-6 px-6 md:mx-0 md:px-0 md:flex-wrap">
           {PRIORITY_TABS.map((tab) => {
             const count = products.filter((p) => p.priority === tab.key).length
             const isActive = activeTab === tab.key
@@ -137,7 +180,7 @@ export default function HomePage() {
               <button
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key)}
-                className={`flex items-center gap-2.5 px-5 py-3 rounded-2xl font-semibold transition-all duration-200 ${
+                className={`flex items-center gap-2.5 px-5 py-3 rounded-2xl font-semibold transition-all duration-200 whitespace-nowrap ${
                   isActive ? 'text-white shadow-lg' : 'bg-white text-gray-500 border-2 border-gray-100 hover:border-purple-200 hover:text-purple-600'
                 }`}
                 style={isActive ? { background: 'linear-gradient(to right, #9B7EDE, #B794F6)' } : {}}>
@@ -209,6 +252,8 @@ export default function HomePage() {
                     key={product.id}
                     product={product}
                     checklistState={checklistState}
+                    ageMonths={ageMonths}
+                    marketCount={marketCounts[product.categorySlug] ?? 0}
                   />
                 ))}
               </div>
@@ -231,9 +276,13 @@ export default function HomePage() {
 function ProductCard({
   product,
   checklistState,
+  ageMonths,
+  marketCount,
 }: {
   product: ProductWithPriority
   checklistState: Record<string, string>
+  ageMonths: number
+  marketCount: number
 }) {
   const router = useRouter()
   const necessity = NECESSITY_LABELS[product.necessity]
@@ -276,6 +325,13 @@ function ProductCard({
           </div>
         </div>
 
+        {product.priority === 'SOON' && (
+          <div className="mb-2">
+            <span className="text-xs font-bold px-2 py-1 rounded-full bg-amber-100 text-amber-700">
+              ⏰ {product.ageMinMonths - ageMonths}개월 후 필요
+            </span>
+          </div>
+        )}
         <Link href={`/products/${product.id}`}>
           <h3 className={`font-bold text-gray-800 leading-snug hover:text-purple-600 transition-colors mb-2 ${
             status === 'BOUGHT' ? 'line-through text-gray-400' : ''
@@ -290,7 +346,12 @@ function ProductCard({
       <div className="mt-auto border-t border-gray-50 px-5 py-4">
         <div className="flex items-center justify-between mb-3">
           <span className="text-sm font-semibold text-gray-600">{product.priceRange}</span>
-          <div className="flex gap-1">
+          <div className="flex items-center gap-1">
+            {marketCount > 0 && (
+              <span className="text-xs px-2 py-0.5 rounded-full bg-blue-50 text-blue-500 font-bold">
+                🛒 {marketCount}
+              </span>
+            )}
             {product.ddokPillars.map((p) => (
               <span key={p} className="text-xs px-1.5 py-0.5 rounded-full bg-purple-50 text-purple-600 font-bold">{p}</span>
             ))}

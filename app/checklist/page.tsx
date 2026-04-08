@@ -5,12 +5,12 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import {
   calculateAgeInMonths,
-  getRecommendations,
   getAgeLabel,
   NECESSITY_LABELS,
   CATEGORY_INFO,
   type ProductWithPriority,
 } from '@/lib/recommendations'
+import { fetchRecommendations } from '@/lib/supabase-queries'
 
 type StatusFilter = 'ALL' | 'BOUGHT' | 'PENDING' | 'SKIP' | 'NONE'
 
@@ -26,7 +26,7 @@ export default function ChecklistPage() {
     if (!birthdate) { router.push('/'); return }
     const months = calculateAgeInMonths(birthdate)
     setAgeMonths(months)
-    setProducts(getRecommendations(months))
+    fetchRecommendations(months).then(setProducts)
     const cl = localStorage.getItem('ddokddok_checklist')
     if (cl) setChecklistState(JSON.parse(cl))
   }, [router])

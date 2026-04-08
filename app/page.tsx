@@ -87,14 +87,14 @@ export default function LandingPage() {
               <p className="text-xs text-gray-400">🔒 생년월일은 이 기기에만 저장됩니다. 서버로 전송되지 않아요.</p>
 
               {/* Stats */}
-              <div className="flex gap-8 pt-2">
+              <div className="flex gap-6 md:gap-8 pt-2">
                 {[
-                  { num: '72개', desc: '검증된 추천 아이템' },
-                  { num: '6단계', desc: '발달 구간별 맞춤' },
-                  { num: '8가지', desc: '발달 이론 근거' },
+                  { num: '72개', desc: '추천 아이템' },
+                  { num: '6단계', desc: '발달 구간' },
+                  { num: '8가지', desc: '이론 근거' },
                 ].map((s) => (
                   <div key={s.desc}>
-                    <div className="text-2xl font-bold" style={{ color: '#9B7EDE' }}>{s.num}</div>
+                    <div className="text-xl md:text-2xl font-bold" style={{ color: '#9B7EDE' }}>{s.num}</div>
                     <div className="text-xs text-gray-500 mt-0.5">{s.desc}</div>
                   </div>
                 ))}
@@ -159,13 +159,13 @@ export default function LandingPage() {
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">어떻게 사용하나요?</h2>
             <p className="text-gray-500 text-lg">30초 안에 우리 아이 맞춤 추천을 받아보세요</p>
           </div>
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-8">
             {[
               { step: '01', icon: '🗓️', title: '생년월일 입력', desc: '아이 생년월일만 입력하면 개월 수를 자동으로 계산해요. 회원가입 없이 바로 시작!' },
               { step: '02', icon: '🎯', title: '맞춤 추천 확인', desc: '지금 필요 / 곧 필요 / 아직 이른 것으로 나눠 타이밍에 맞는 추천을 보여줘요.' },
               { step: '03', icon: '✅', title: '구매 & 체크', desc: '체크리스트로 구매 현황을 관리하세요. 완료·보류·생략으로 구매 상태를 기록할 수 있어요.' },
             ].map((item) => (
-              <div key={item.step} className="relative p-8 rounded-3xl border-2 border-gray-100 hover:border-purple-200 hover:shadow-lg transition-all duration-300 group">
+              <div key={item.step} className="relative p-6 md:p-8 rounded-3xl border-2 border-gray-100 hover:border-purple-200 hover:shadow-lg transition-all duration-300 group">
                 <div className="absolute top-6 right-6 text-5xl font-black text-gray-50 group-hover:text-purple-50 transition-colors select-none">{item.step}</div>
                 <div className="text-4xl mb-5">{item.icon}</div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">{item.title}</h3>
@@ -184,7 +184,7 @@ export default function LandingPage() {
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">4가지 카테고리</h2>
             <p className="text-gray-500 text-lg">발달 단계별로 필요한 모든 것을 담았어요</p>
           </div>
-          <div className="grid md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
             {[
               { icon: '🛏️', name: '자기·위생', items: '수면, 위생, 목욕', color: 'from-indigo-50 to-indigo-100', badge: 'border-indigo-200' },
               { icon: '🍼', name: '먹기', items: '수유, 이유식, 식기', color: 'from-yellow-50 to-amber-100', badge: 'border-yellow-200' },
@@ -192,7 +192,7 @@ export default function LandingPage() {
               { icon: '🚗', name: '외출·안전', items: '외출용품, 안전용품', color: 'from-green-50 to-emerald-100', badge: 'border-green-200' },
             ].map((cat) => (
               <div key={cat.name}
-                   className={`p-7 rounded-3xl bg-gradient-to-br ${cat.color} border-2 ${cat.badge} hover:shadow-xl transition-all duration-300 hover:-translate-y-1 relative`}>
+                   className={`p-5 md:p-7 rounded-3xl bg-gradient-to-br ${cat.color} border-2 ${cat.badge} hover:shadow-xl transition-all duration-300 hover:-translate-y-1 relative`}>
                 <div className="text-5xl mb-4">{cat.icon}</div>
                 <h3 className="text-xl font-bold text-gray-900 mb-1">{cat.name}</h3>
                 <p className="text-sm text-gray-500">{cat.items}</p>
