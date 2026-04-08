@@ -30,7 +30,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
       if (p) {
         const months = calculateAgeInMonths(birthdate)
         fetchDdokFramework(months).then(setDdok)
-        fetchMarketProducts(p.categorySlug, p.name).then(setMarketProducts)
+        fetchMarketProducts(p.categorySlug, params.id).then(setMarketProducts)
       }
     })
   }, [params.id, router])
@@ -239,8 +239,8 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
                   </div>
                 </div>
               ) : (
-                <div className="w-full py-4 rounded-2xl bg-gray-100 text-gray-400 font-medium text-base text-center mb-3">
-                  🔗 구매 링크 준비 중
+                <div className="w-full py-4 rounded-2xl bg-gray-50 border border-dashed border-gray-200 text-gray-400 text-sm text-center mb-3">
+                  🛒 이 제품의 구매처 데이터를 준비 중이에요
                 </div>
               )}
 

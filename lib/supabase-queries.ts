@@ -85,75 +85,60 @@ export async function fetchMarketCountByCategory(): Promise<Record<string, numbe
   return counts
 }
 
-// 카테고리 슬러그 → 대분류 매핑
-const SLUG_TO_MAIN: Record<string, string> = {
-  feeding: '먹기',
-  sleep:   '자기·위생',
-  play:    '놀기·배우기',
-  outdoor: '외출·안전',
+// 제품 ID → 엑셀 소분류(category_sub) 정확 매핑
+const PRODUCT_TO_CATEGORY_SUB: Record<string, string> = {
+  // 수면용품
+  '0-1m-sleep-2':  '속싸개·스와들',   // 속싸개 / 스와들업
+  // 먹기 - 젖병·수유용품
+  '0-1m-feeding-1': '젖병',            // 젖병 & 젖병 소독기
+  '1-3m-feeding-3': '젖병 액세서리',   // 젖꼭지
+  // 외출·안전
+  '0-1m-outdoor-1': '카시트',          // 신생아 카시트
+  '0-1m-outdoor-2': '아기띠·슬링',     // 아기띠 (신생아용)
+  '0-1m-outdoor-3': '유모차',          // 신생아용 바구니형 유모차
+  '1-3m-outdoor-1': '유모차',          // 절충형 유모차
+  '3-6m-outdoor-2': '아기띠·슬링',     // 힙시트
+  // 놀기·배우기
+  '0-1m-play-3':   '모빌',             // 모빌
+  '1-3m-play-1':   '감각발달완구',     // 촉감책
+  '1-3m-play-2':   '치발기',           // 소리나는 장난감·치발기
+  '3-6m-play-1':   '감각발달완구',     // 짐보리 (플레이짐)
+  '3-6m-play-2':   '치발기',           // 치발기 (냉장 보관형)
+  '6-12m-play-1':  '사운드완구',       // 사운드북
+  '6-12m-play-2':  '영유아완구',       // 소프트 블록
+  '6-12m-play-3':  '영유아완구',       // 보행기/푸시카
+  '12-24m-play-1': '영유아완구',       // 역할놀이 장난감
+  '12-24m-play-3': '영유아완구',       // 그림책 세트
+  '24-36m-play-1': '영유아완구',       // 블록 장난감
+  '24-36m-play-2': '영유아완구',       // 퍼즐
+  '24-36m-play-3': '영유아완구',       // 신체 발달 장난감
+  // 위생·케어
+  '12-24m-sleep-1': '구강케어',        // 유아용 칫솔 & 치약
 }
 
 export async function fetchMarketProducts(
   categorySlug: string,
-  productName: string,
+  productId: string,
   limit = 8
 ): Promise<MarketProduct[]> {
-  const categoryMain = SLUG_TO_MAIN[categorySlug]
+  const categorySub = PRODUCT_TO_CATEGORY_SUB[productId]
 
-  // 제품명에서 핵심 키워드 추출 (괄호 제거, 첫 2단어)
-  const keywords = productName
-    .replace(/\(.*?\)/g, '')
-    .split(/[\s·,\/]+/)
-    .filter((w) => w.length >= 2)
-    .slice(0, 3)
-
-  // 1차: 제품명 키워드로 name 검색
-  if (keywords.length > 0) {
-    const orFilter = keywords.map((k) => `name.ilike.%${k}%`).join(',')
+  // 1차: 소분류 정확 매핑이 있으면 category_sub로 검색
+  if (categorySub) {
     const { data } = await supabase
       .from('market_products')
       .select('*')
       .not('thumbnail_url', 'is', null)
       .not('detail_url', 'is', null)
-      .or(orFilter)
+      .eq('category_sub', categorySub)
       .order('review_count', { ascending: false, nullsFirst: false })
       .limit(limit)
 
     if (data && data.length > 0) return data as MarketProduct[]
   }
 
-  // 2차: 키워드 매칭 없으면 중분류로 검색
-  const subMap: Record<string, string> = {
-    feeding: '젖병·수유용품',
-    sleep:   '수면용품',
-    play:    '치발기·완구',
-    outdoor: '외출용품',
-  }
-  const categoryMid = subMap[categorySlug]
-
-  const { data } = await supabase
-    .from('market_products')
-    .select('*')
-    .not('thumbnail_url', 'is', null)
-    .not('detail_url', 'is', null)
-    .eq('category_main', categoryMain ?? '')
-    .eq('category_mid', categoryMid ?? '')
-    .order('review_count', { ascending: false, nullsFirst: false })
-    .limit(limit)
-
-  if (data && data.length > 0) return data as MarketProduct[]
-
-  // 3차: 대분류만으로 검색
-  const { data: fallback } = await supabase
-    .from('market_products')
-    .select('*')
-    .not('thumbnail_url', 'is', null)
-    .not('detail_url', 'is', null)
-    .eq('category_main', categoryMain ?? '')
-    .order('review_count', { ascending: false, nullsFirst: false })
-    .limit(limit)
-
-  return (fallback ?? []) as MarketProduct[]
+  // 매핑 없는 제품은 빈 배열 반환 (잘못된 데이터 노출 방지)
+  return []
 }
 
 export async function fetchDdokFramework(ageMonths: number) {
