@@ -64,7 +64,7 @@ export default function ChecklistPage() {
       {/* GNB */}
       <nav className="border-b border-gray-100 bg-white sticky top-0 z-50 shadow-sm">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="text-xl font-bold" style={{ color: '#9B7EDE' }}>똑똑한 엄마</Link>
+          <Link href="/home" className="text-xl font-bold" style={{ color: '#9B7EDE' }}>똑똑한 엄마</Link>
           <div className="flex items-center gap-4">
             <Link href="/home" className="text-sm text-gray-500 hover:text-purple-600 transition-colors">← 홈으로</Link>
           </div>

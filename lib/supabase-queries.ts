@@ -117,8 +117,8 @@ export async function fetchMarketCountByCategory(): Promise<Record<string, numbe
   return counts
 }
 
-// 제품 ID → 엑셀 소분류(category_sub) 정확 매핑
-const PRODUCT_TO_CATEGORY_SUB: Record<string, string> = {
+// 제품 ID → 엑셀 소분류(category_sub) 정확 매핑 (export: 홈 카드 뱃지용)
+export const PRODUCT_TO_CATEGORY_SUB: Record<string, string> = {
   // 수면용품
   '0-1m-sleep-2':  '속싸개·스와들',   // 속싸개 / 스와들업
   // 먹기 - 젖병·수유용품

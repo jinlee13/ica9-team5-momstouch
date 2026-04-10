@@ -12,7 +12,7 @@ import {
   type ProductWithPriority,
   type Priority,
 } from '@/lib/recommendations'
-import { fetchRecommendations, fetchDdokFramework, fetchMarketCountByCategory } from '@/lib/supabase-queries'
+import { fetchRecommendations, fetchDdokFramework, PRODUCT_TO_CATEGORY_SUB } from '@/lib/supabase-queries'
 
 const PRIORITY_TABS: { key: Priority; label: string; emoji: string; desc: string }[] = [
   { key: 'NOW', label: '지금 필요', emoji: '🔥', desc: '현재 개월 수에 딱 맞는 아이템' },
@@ -37,7 +37,6 @@ export default function HomePage() {
   const [products, setProducts] = useState<ProductWithPriority[]>([])
   const [checklistState, setChecklistState] = useState<Record<string, string>>({})
   const [ddok, setDdok] = useState<{ label: string; subtitle: string; reason_template: string } | null>(null)
-  const [marketCounts, setMarketCounts] = useState<Record<string, number>>({})
 
   useEffect(() => {
     const saved = localStorage.getItem('ddokddok_birthdate')
@@ -49,7 +48,6 @@ export default function HomePage() {
     if (cl) setChecklistState(JSON.parse(cl))
     fetchRecommendations(months).then(setProducts)
     fetchDdokFramework(months).then(setDdok)
-    fetchMarketCountByCategory().then(setMarketCounts)
   }, [router])
 
   const filtered = products.filter((p) => {
@@ -69,25 +67,25 @@ export default function HomePage() {
       {/* GNB */}
       <nav className="border-b border-gray-100 bg-white sticky top-0 z-50 shadow-sm">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="text-xl font-bold" style={{ color: '#9B7EDE' }}>똑똑한 엄마</Link>
+          <Link href="/home" className="text-xl font-bold" style={{ color: '#9B7EDE' }}>똑똑한 엄마</Link>
           <div className="flex items-center gap-2 md:gap-4">
             <span className="hidden sm:block text-sm text-gray-500">
               우리 아이: <strong className="text-gray-800">{getAgeLabel(ageMonths)}</strong>
             </span>
             <span className="sm:hidden text-sm font-bold" style={{ color: '#9B7EDE' }}>{getAgeLabel(ageMonths)}</span>
-            <Link href="/guide"
-                  className="hidden sm:block text-sm font-semibold px-4 py-2 rounded-full border-2 border-amber-200 text-amber-700 hover:bg-amber-50 transition-colors">
-              📅 준비 가이드
-            </Link>
             <Link href="/checklist"
                   className="text-sm font-semibold px-3 md:px-4 py-2 rounded-full border-2 border-purple-200 text-purple-600 hover:bg-purple-50 transition-colors">
               ✅ <span className="hidden sm:inline">체크리스트</span>
             </Link>
             <button
-              onClick={() => { localStorage.removeItem('ddokddok_birthdate'); router.push('/') }}
+              onClick={() => {
+                if (confirm('생년월일을 변경하면 초기화됩니다. 계속하시겠어요?')) {
+                  localStorage.removeItem('ddokddok_birthdate')
+                  router.push('/')
+                }
+              }}
               className="text-xs text-gray-400 hover:text-gray-600 border border-gray-200 rounded-full px-2 md:px-3 py-1.5 transition-colors">
-              <span className="hidden sm:inline">생년월일 변경</span>
-              <span className="sm:hidden">변경</span>
+              ⚙️ <span className="hidden sm:inline">생년월일 변경</span>
             </button>
           </div>
         </div>
@@ -253,7 +251,7 @@ export default function HomePage() {
                     product={product}
                     checklistState={checklistState}
                     ageMonths={ageMonths}
-                    marketCount={marketCounts[product.categorySlug] ?? 0}
+                    hasMarketData={product.id in PRODUCT_TO_CATEGORY_SUB}
                   />
                 ))}
               </div>
@@ -277,12 +275,12 @@ function ProductCard({
   product,
   checklistState,
   ageMonths,
-  marketCount,
+  hasMarketData,
 }: {
   product: ProductWithPriority
   checklistState: Record<string, string>
   ageMonths: number
-  marketCount: number
+  hasMarketData: boolean
 }) {
   const router = useRouter()
   const necessity = NECESSITY_LABELS[product.necessity]
@@ -347,9 +345,13 @@ function ProductCard({
         <div className="flex items-center justify-between mb-3">
           <span className="text-sm font-semibold text-gray-600">{product.priceRange}</span>
           <div className="flex items-center gap-1">
-            {marketCount > 0 && (
+            {hasMarketData ? (
               <span className="text-xs px-2 py-0.5 rounded-full bg-blue-50 text-blue-500 font-bold">
-                🛒 {marketCount}
+                🛒 구매처
+              </span>
+            ) : (
+              <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-400 font-medium">
+                준비중
               </span>
             )}
             {product.ddokPillars.map((p) => (
