@@ -12,7 +12,9 @@ import {
   type Product,
 } from '@/lib/recommendations'
 import { fetchProductById, fetchDdokFramework, fetchMarketProducts, type MarketProduct } from '@/lib/supabase-queries'
-import { trackProductView, trackMarketClick, trackChecklist } from '@/lib/analytics'
+import { trackProductView, trackChecklist } from '@/lib/analytics'
+import { cartStore } from '@/lib/cart'
+import CartBadge from '@/components/CartBadge'
 
 export default function ProductDetailPage({ params }: { params: { id: string } }) {
   const router = useRouter()
@@ -20,6 +22,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
   const [product, setProduct] = useState<Product | null>(null)
   const [ddok, setDdok] = useState<{ label: string; subtitle: string; reason_template: string } | null>(null)
   const [marketProducts, setMarketProducts] = useState<MarketProduct[]>([])
+  const [addedIds, setAddedIds] = useState<Set<number>>(new Set())
 
   useEffect(() => {
     const birthdate = localStorage.getItem('ddokddok_birthdate')
@@ -31,7 +34,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
       if (p) {
         const months = calculateAgeInMonths(birthdate)
         fetchDdokFramework(months).then(setDdok)
-        fetchMarketProducts(p.categorySlug, params.id).then(setMarketProducts)
+        fetchMarketProducts(p.categorySlug, params.id, months).then(setMarketProducts)
         trackProductView(params.id, p.name, p.categoryName)
       }
     })
@@ -69,7 +72,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
       <nav className="border-b border-gray-100 bg-white sticky top-0 z-50 shadow-sm">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/home" className="text-xl font-bold" style={{ color: '#9B7EDE' }}>똑똑한 엄마</Link>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <button onClick={() => router.back()}
                     className="text-sm text-gray-500 hover:text-purple-600 transition-colors">
               ← 목록으로
@@ -78,6 +81,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
                   className="text-sm font-semibold px-4 py-2 rounded-full border-2 border-purple-200 text-purple-600 hover:bg-purple-50 transition-colors">
               ✅ 체크리스트
             </Link>
+            <CartBadge />
           </div>
         </div>
       </nav>
@@ -196,55 +200,71 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
                 </div>
               </div>
 
-              {/* Buy Link — market products */}
+              {/* 장바구니 — market products */}
               {marketProducts.length > 0 ? (
                 <div className="mb-3">
-                  <p className="text-xs text-gray-400 font-medium mb-2 text-center">지금 살 수 있는 제품 {marketProducts.length}개</p>
-                  <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
-                    {marketProducts.map((mp) => (
-                      <a
-                        key={mp.id}
-                        href={mp.detail_url ?? '#'}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={() => product && trackMarketClick(params.id, product.name, mp.id, mp.name, product.categoryName)}
-                        className="flex items-center gap-3 p-2.5 rounded-xl border border-gray-100 hover:border-purple-200 hover:bg-purple-50 transition-all group"
-                      >
-                        {mp.thumbnail_url ? (
-                          <img
-                            src={mp.thumbnail_url}
-                            alt={mp.name}
-                            className="w-12 h-12 rounded-lg object-cover flex-shrink-0 bg-gray-100"
-                            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
-                          />
-                        ) : (
-                          <div className="w-12 h-12 rounded-lg bg-gray-100 flex-shrink-0" />
-                        )}
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs font-semibold text-gray-800 line-clamp-2 leading-snug group-hover:text-purple-700">
-                            {mp.name}
-                          </p>
-                          <div className="flex items-center gap-2 mt-0.5">
-                            <span className="text-xs font-bold text-purple-600">{mp.price}</span>
-                            {mp.rating && (
-                              <span className="text-xs text-gray-400">⭐ {mp.rating}</span>
-                            )}
-                            {mp.review_count && mp.review_count > 0 ? (
-                              <span className="text-xs text-gray-400">리뷰 {mp.review_count.toLocaleString()}</span>
-                            ) : null}
-                          </div>
-                          {mp.brand && (
-                            <p className="text-xs text-gray-400 truncate">{mp.brand}</p>
+                  <p className="text-xs text-gray-400 font-medium mb-2 text-center">
+                    연령에 맞는 제품 {marketProducts.length}개
+                  </p>
+                  <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
+                    {marketProducts.map((mp) => {
+                      const added = addedIds.has(mp.id)
+                      return (
+                        <div
+                          key={mp.id}
+                          className="flex items-center gap-3 p-2.5 rounded-xl border border-gray-100 bg-white"
+                        >
+                          {mp.thumbnail_url ? (
+                            <img
+                              src={mp.thumbnail_url}
+                              alt={mp.name}
+                              className="w-12 h-12 rounded-lg object-cover flex-shrink-0 bg-gray-100"
+                              onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
+                            />
+                          ) : (
+                            <div className="w-12 h-12 rounded-lg bg-gray-100 flex-shrink-0" />
                           )}
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs font-semibold text-gray-800 line-clamp-2 leading-snug">
+                              {mp.name}
+                            </p>
+                            <div className="flex items-center gap-2 mt-0.5">
+                              <span className="text-xs font-bold text-purple-600">{mp.price}</span>
+                              {mp.rating && (
+                                <span className="text-xs text-gray-400">⭐ {mp.rating}</span>
+                              )}
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => {
+                              cartStore.add({
+                                id: mp.id,
+                                name: mp.name,
+                                brand: mp.brand,
+                                price: mp.price,
+                                original_price: mp.original_price,
+                                thumbnail_url: mp.thumbnail_url,
+                                category_main: mp.category_main,
+                                category_sub: mp.category_sub,
+                              })
+                              setAddedIds(prev => new Set(prev).add(mp.id))
+                            }}
+                            className={`flex-shrink-0 text-xs font-bold px-3 py-1.5 rounded-xl border-2 transition-all ${
+                              added
+                                ? 'bg-green-50 text-green-600 border-green-200'
+                                : 'bg-purple-50 text-purple-600 border-purple-200 hover:bg-purple-100'
+                            }`}
+                          >
+                            {added ? '✅ 담김' : '담기'}
+                          </button>
                         </div>
-                        <span className="text-xs text-gray-300 group-hover:text-purple-400 flex-shrink-0">→</span>
-                      </a>
-                    ))}
+                      )
+                    })}
                   </div>
                 </div>
               ) : (
                 <div className="w-full py-4 rounded-2xl bg-gray-50 border border-dashed border-gray-200 text-gray-400 text-sm text-center mb-3">
-                  🛒 이 제품의 구매처 데이터를 준비 중이에요
+                  🛒 이 제품의 데이터를 준비 중이에요
                 </div>
               )}
 

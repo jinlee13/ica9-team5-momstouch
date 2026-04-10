@@ -148,29 +148,51 @@ export const PRODUCT_TO_CATEGORY_SUB: Record<string, string> = {
   '12-24m-sleep-1': '구강케어',        // 유아용 칫솔 & 치약
 }
 
+// "0-6개월", "6~12개월", "신생아" 등 텍스트 → {min, max} 파싱
+function parseAgeRange(ageStr: string | null): { min: number; max: number } | null {
+  if (!ageStr) return null
+  const m = ageStr.match(/(\d+)[~\-](\d+)/)
+  if (m) return { min: parseInt(m[1]), max: parseInt(m[2]) }
+  if (/신생아|newborn/i.test(ageStr)) return { min: 0, max: 3 }
+  if (/0개월|0m/i.test(ageStr)) return { min: 0, max: 6 }
+  return null
+}
+
 export async function fetchMarketProducts(
   categorySlug: string,
   productId: string,
-  limit = 8
+  ageMonths?: number,
+  limit = 12
 ): Promise<MarketProduct[]> {
   const categorySub = PRODUCT_TO_CATEGORY_SUB[productId]
+  if (!categorySub) return []
 
-  // 1차: 소분류 정확 매핑이 있으면 category_sub로 검색
-  if (categorySub) {
-    const { data } = await supabase
-      .from('market_products')
-      .select('*')
-      .not('thumbnail_url', 'is', null)
-      .not('detail_url', 'is', null)
-      .eq('category_sub', categorySub)
-      .order('review_count', { ascending: false, nullsFirst: false })
-      .limit(limit)
+  // 충분히 많이 가져온 뒤 연령 필터링
+  const { data } = await supabase
+    .from('market_products')
+    .select('*')
+    .not('thumbnail_url', 'is', null)
+    .not('detail_url', 'is', null)
+    .eq('category_sub', categorySub)
+    .order('review_count', { ascending: false, nullsFirst: false })
+    .limit(limit * 4)
 
-    if (data && data.length > 0) return data as MarketProduct[]
+  if (!data || data.length === 0) return []
+
+  let results = data as MarketProduct[]
+
+  // 연령 필터: age_recommendation이 있으면 아이 개월수와 비교
+  if (ageMonths !== undefined) {
+    const ageFiltered = results.filter((mp) => {
+      const range = parseAgeRange(mp.age_recommendation)
+      if (!range) return true // 연령 정보 없으면 포함
+      return ageMonths >= range.min && ageMonths <= range.max
+    })
+    // 필터 결과가 있을 때만 적용 (결과가 0이면 전체 유지)
+    if (ageFiltered.length > 0) results = ageFiltered
   }
 
-  // 매핑 없는 제품은 빈 배열 반환 (잘못된 데이터 노출 방지)
-  return []
+  return results.slice(0, limit)
 }
 
 export async function fetchDdokFramework(ageMonths: number) {

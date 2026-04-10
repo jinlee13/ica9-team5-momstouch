@@ -13,6 +13,7 @@ import {
   type Priority,
 } from '@/lib/recommendations'
 import { fetchRecommendations, fetchDdokFramework, PRODUCT_TO_CATEGORY_SUB } from '@/lib/supabase-queries'
+import CartBadge from '@/components/CartBadge'
 
 const PRIORITY_TABS: { key: Priority; label: string; emoji: string; desc: string }[] = [
   { key: 'NOW', label: '지금 필요', emoji: '🔥', desc: '현재 개월 수에 딱 맞는 아이템' },
@@ -77,6 +78,7 @@ export default function HomePage() {
                   className="text-sm font-semibold px-3 md:px-4 py-2 rounded-full border-2 border-purple-200 text-purple-600 hover:bg-purple-50 transition-colors">
               ✅ <span className="hidden sm:inline">체크리스트</span>
             </Link>
+            <CartBadge />
             <button
               onClick={() => {
                 if (confirm('생년월일을 변경하면 초기화됩니다. 계속하시겠어요?')) {
