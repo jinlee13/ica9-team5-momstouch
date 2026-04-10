@@ -76,6 +76,10 @@ export default function HomePage() {
               우리 아이: <strong className="text-gray-800">{getAgeLabel(ageMonths)}</strong>
             </span>
             <span className="sm:hidden text-sm font-bold" style={{ color: '#9B7EDE' }}>{getAgeLabel(ageMonths)}</span>
+            <Link href="/browse"
+                  className="text-sm font-semibold px-3 md:px-4 py-2 rounded-full border-2 border-gray-200 text-gray-600 hover:border-purple-200 hover:text-purple-600 transition-colors">
+              🛍️ <span className="hidden sm:inline">전체 상품</span>
+            </Link>
             <Link href="/checklist"
                   className="text-sm font-semibold px-3 md:px-4 py-2 rounded-full border-2 border-purple-200 text-purple-600 hover:bg-purple-50 transition-colors">
               ✅ <span className="hidden sm:inline">체크리스트</span>
@@ -263,8 +267,20 @@ export default function HomePage() {
         </div>
       </div>
 
+      {/* Browse CTA */}
+      <div className="max-w-7xl mx-auto px-6 mt-10 mb-4">
+        <Link href="/browse"
+              className="flex items-center justify-between bg-white rounded-2xl p-5 border-2 border-gray-100 hover:border-purple-200 hover:shadow-md transition-all group">
+          <div>
+            <p className="font-bold text-gray-800 group-hover:text-purple-700 transition-colors">🛍️ 전체 상품 둘러보기</p>
+            <p className="text-sm text-gray-400 mt-0.5">기저귀, 물티슈, 분유 등 5,000개+ 육아용품 전체 탐색</p>
+          </div>
+          <span className="text-gray-300 text-xl group-hover:text-purple-400 transition-colors">›</span>
+        </Link>
+      </div>
+
       {/* Footer */}
-      <footer className="mt-16 bg-white border-t border-gray-100 py-8">
+      <footer className="mt-4 bg-white border-t border-gray-100 py-8">
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-3 text-sm text-gray-400">
           <Link href="/" className="font-bold text-purple-500">똑똑한 엄마</Link>
           <p>이 정보는 참고용이며 의료적 조언이 아닙니다.</p>
