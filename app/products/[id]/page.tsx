@@ -206,57 +206,65 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
                   <p className="text-xs text-gray-400 font-medium mb-2 text-center">
                     연령에 맞는 제품 {marketProducts.length}개
                   </p>
-                  <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
+                  <div className="space-y-2 max-h-96 overflow-y-auto pr-1">
                     {marketProducts.map((mp) => {
                       const added = addedIds.has(mp.id)
                       return (
                         <div
                           key={mp.id}
-                          className="flex items-center gap-3 p-2.5 rounded-xl border border-gray-100 bg-white"
+                          className="rounded-xl border border-gray-100 bg-white overflow-hidden"
                         >
-                          {mp.thumbnail_url ? (
-                            <img
-                              src={mp.thumbnail_url}
-                              alt={mp.name}
-                              className="w-12 h-12 rounded-lg object-cover flex-shrink-0 bg-gray-100"
-                              onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
-                            />
-                          ) : (
-                            <div className="w-12 h-12 rounded-lg bg-gray-100 flex-shrink-0" />
-                          )}
-                          <div className="flex-1 min-w-0">
-                            <p className="text-xs font-semibold text-gray-800 line-clamp-2 leading-snug">
-                              {mp.name}
-                            </p>
-                            <div className="flex items-center gap-2 mt-0.5">
-                              <span className="text-xs font-bold text-purple-600">{mp.price}</span>
-                              {mp.rating && (
-                                <span className="text-xs text-gray-400">⭐ {mp.rating}</span>
-                              )}
+                          {/* 클릭 시 상세 페이지로 이동 */}
+                          <Link href={`/market/${mp.id}`} className="flex items-center gap-3 p-3 hover:bg-purple-50 transition-colors">
+                            {mp.thumbnail_url ? (
+                              <img
+                                src={mp.thumbnail_url}
+                                alt={mp.name}
+                                className="w-20 h-20 rounded-lg object-cover flex-shrink-0 bg-gray-100"
+                                onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
+                              />
+                            ) : (
+                              <div className="w-20 h-20 rounded-lg bg-gray-100 flex-shrink-0 flex items-center justify-center text-3xl">🛍️</div>
+                            )}
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-semibold text-gray-800 line-clamp-2 leading-snug">
+                                {mp.name}
+                              </p>
+                              {mp.brand && <p className="text-xs text-gray-400 mt-0.5">{mp.brand}</p>}
+                              <div className="flex items-center gap-2 mt-1">
+                                <span className="text-sm font-bold text-purple-600">{mp.price}</span>
+                                {mp.rating && (
+                                  <span className="text-xs text-gray-400">⭐ {mp.rating}</span>
+                                )}
+                              </div>
                             </div>
+                            <span className="text-gray-300 text-sm flex-shrink-0">›</span>
+                          </Link>
+                          {/* 장바구니 버튼 */}
+                          <div className="px-3 pb-2.5">
+                            <button
+                              onClick={() => {
+                                cartStore.add({
+                                  id: mp.id,
+                                  name: mp.name,
+                                  brand: mp.brand,
+                                  price: mp.price,
+                                  original_price: mp.original_price,
+                                  thumbnail_url: mp.thumbnail_url,
+                                  category_main: mp.category_main,
+                                  category_sub: mp.category_sub,
+                                })
+                                setAddedIds(prev => new Set(prev).add(mp.id))
+                              }}
+                              className={`w-full text-xs font-bold py-2 rounded-xl border-2 transition-all ${
+                                added
+                                  ? 'bg-green-50 text-green-600 border-green-200'
+                                  : 'bg-purple-50 text-purple-600 border-purple-200 hover:bg-purple-100'
+                              }`}
+                            >
+                              {added ? '✅ 장바구니에 담김' : '🛒 장바구니에 담기'}
+                            </button>
                           </div>
-                          <button
-                            onClick={() => {
-                              cartStore.add({
-                                id: mp.id,
-                                name: mp.name,
-                                brand: mp.brand,
-                                price: mp.price,
-                                original_price: mp.original_price,
-                                thumbnail_url: mp.thumbnail_url,
-                                category_main: mp.category_main,
-                                category_sub: mp.category_sub,
-                              })
-                              setAddedIds(prev => new Set(prev).add(mp.id))
-                            }}
-                            className={`flex-shrink-0 text-xs font-bold px-3 py-1.5 rounded-xl border-2 transition-all ${
-                              added
-                                ? 'bg-green-50 text-green-600 border-green-200'
-                                : 'bg-purple-50 text-purple-600 border-purple-200 hover:bg-purple-100'
-                            }`}
-                          >
-                            {added ? '✅ 담김' : '담기'}
-                          </button>
                         </div>
                       )
                     })}

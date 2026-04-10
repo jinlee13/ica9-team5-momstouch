@@ -90,10 +90,21 @@ export interface MarketProduct {
   category_sub: string | null
   thumbnail_url: string | null
   detail_url: string | null
+  detail_images: string[] | null
   rating: number | null
   review_count: number | null
   age_recommendation: string | null
   source_site: string | null
+}
+
+export async function fetchMarketProductById(id: number): Promise<MarketProduct | null> {
+  const { data, error } = await supabase
+    .from('market_products')
+    .select('*')
+    .eq('id', id)
+    .single()
+  if (error) return null
+  return data as MarketProduct
 }
 
 // 카테고리별 마켓 상품 개수 (홈 카드 뱃지용)
