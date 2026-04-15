@@ -14,6 +14,7 @@ import {
 } from '@/lib/recommendations'
 import { fetchRecommendations, fetchDdokFramework, PRODUCT_TO_CATEGORY_SUB } from '@/lib/supabase-queries'
 import CartBadge from '@/components/CartBadge'
+import ChatModal from '@/components/chat/ChatModal'
 
 const PRIORITY_TABS: { key: Priority; label: string; emoji: string; desc: string }[] = [
   { key: 'NOW', label: '지금 필요', emoji: '🔥', desc: '현재 개월 수에 딱 맞는 아이템' },
@@ -38,6 +39,7 @@ export default function HomePage() {
   const [products, setProducts] = useState<ProductWithPriority[]>([])
   const [checklistState, setChecklistState] = useState<Record<string, string>>({})
   const [ddok, setDdok] = useState<{ label: string; subtitle: string; reason_template: string } | null>(null)
+  const [chatOpen, setChatOpen] = useState(false)
 
   useEffect(() => {
     const saved = localStorage.getItem('ddokddok_birthdate')
@@ -98,6 +100,27 @@ export default function HomePage() {
           </div>
         </div>
       </nav>
+
+      {/* AI 챗봇 배너 */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-4">
+        <button
+          onClick={() => setChatOpen(true)}
+          className="w-full flex items-center gap-3 px-5 py-4 rounded-2xl text-white text-left transition-all hover:opacity-90 active:scale-[0.99] shadow-md"
+          style={{ background: 'linear-gradient(135deg, #9B7EDE, #B794F6)' }}
+        >
+          <span className="text-2xl flex-shrink-0">🤱</span>
+          <div className="flex-1 min-w-0">
+            <p className="font-semibold text-sm">AI에게 물어보세요</p>
+            <p className="text-purple-100 text-xs truncate">
+              {ageMonths}개월 맞춤 추천 · 육아 Q&A · 제품 비교
+            </p>
+          </div>
+          <span className="text-purple-200 text-lg flex-shrink-0">→</span>
+        </button>
+      </div>
+
+      {/* ChatModal */}
+      <ChatModal isOpen={chatOpen} onClose={() => setChatOpen(false)} ageMonths={ageMonths} />
 
       <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Page Header */}

@@ -3,11 +3,13 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import ChatModal from '@/components/chat/ChatModal'
 
 export default function LandingPage() {
   const router = useRouter()
   const [birthdate, setBirthdate] = useState('')
   const [error, setError] = useState('')
+  const [chatOpen, setChatOpen] = useState(false)
 
   useEffect(() => {
     const saved = localStorage.getItem('ddokddok_birthdate')
@@ -85,6 +87,21 @@ export default function LandingPage() {
                 </button>
               </form>
               <p className="text-xs text-gray-400">🔒 생년월일은 이 기기에만 저장됩니다. 서버로 전송되지 않아요.</p>
+
+              {/* AI 챗봇 배너 */}
+              <button
+                onClick={() => setChatOpen(true)}
+                className="flex items-center gap-3 px-5 py-3.5 rounded-2xl text-white text-left transition-all hover:opacity-90 active:scale-[0.99] shadow-md w-full max-w-md"
+                style={{ background: 'linear-gradient(135deg, #9B7EDE, #B794F6)' }}
+              >
+                <span className="text-xl flex-shrink-0">🤱</span>
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-sm">AI에게 먼저 물어보세요</p>
+                  <p className="text-purple-100 text-xs">육아용품 추천 · Q&A · 제품 비교</p>
+                </div>
+                <span className="text-purple-200 flex-shrink-0">→</span>
+              </button>
+              <ChatModal isOpen={chatOpen} onClose={() => setChatOpen(false)} ageMonths={0} />
 
               {/* Stats */}
               <div className="flex gap-6 md:gap-8 pt-2">
