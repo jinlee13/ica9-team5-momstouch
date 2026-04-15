@@ -7,17 +7,11 @@ import { calculateAgeInMonths } from '@/lib/recommendations'
 export default function ChatFloatButton() {
   const [isOpen, setIsOpen] = useState(false)
   const [ageMonths, setAgeMonths] = useState(0)
-  const [hasBirthdate, setHasBirthdate] = useState(false)
 
   useEffect(() => {
     const saved = localStorage.getItem('ddokddok_birthdate')
-    if (saved) {
-      setHasBirthdate(true)
-      setAgeMonths(calculateAgeInMonths(saved))
-    }
+    if (saved) setAgeMonths(calculateAgeInMonths(saved))
   }, [])
-
-  if (!hasBirthdate) return null
 
   return (
     <>
