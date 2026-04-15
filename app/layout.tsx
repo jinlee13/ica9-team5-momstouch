@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import ChatFloatButton from '@/components/chat/ChatFloatButton'
 
 export const metadata: Metadata = {
   title: '똑똑한 엄마',
@@ -11,6 +12,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="ko">
       <body className="min-h-screen bg-gray-50">
         {children}
+        <ChatFloatButton />
       </body>
     </html>
   )
