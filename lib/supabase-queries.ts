@@ -28,7 +28,8 @@ export async function fetchMarketProductsByCat(
   mid?: string,
   sub?: string,
   page = 0,
-  pageSize = 24
+  pageSize = 24,
+  ageMonths?: number
 ): Promise<{ data: MarketProduct[]; hasMore: boolean }> {
   let query = supabase
     .from('market_products')
@@ -37,6 +38,12 @@ export async function fetchMarketProductsByCat(
 
   if (mid) query = query.eq('category_mid', mid)
   if (sub) query = query.eq('category_sub', sub)
+
+  // 월령 필터: recommended_age_min <= ageMonths < recommended_age_max
+  if (ageMonths !== undefined) {
+    query = query.lte('recommended_age_min', ageMonths)
+    query = query.or(`recommended_age_max.is.null,recommended_age_max.gt.${ageMonths}`)
+  }
 
   const { data, error } = await query
     .not('thumbnail_url', 'is', null)
@@ -95,6 +102,8 @@ export interface MarketProduct {
   review_count: number | null
   age_recommendation: string | null
   source_site: string | null
+  recommended_age_min: number | null
+  recommended_age_max: number | null
 }
 
 export async function fetchMarketProductById(id: number): Promise<MarketProduct | null> {

@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { fetchMarketProductsByCat, type MarketProduct } from '@/lib/supabase-queries'
 import { cartStore } from '@/lib/cart'
 import CartBadge from '@/components/CartBadge'
+import { calculateAgeInMonths, getAgeLabel } from '@/lib/recommendations'
 
 const CATEGORIES = [
   {
@@ -42,6 +43,16 @@ const CATEGORIES = [
   },
 ]
 
+// 월령 구간 필터 버튼
+const AGE_FILTERS = [
+  { label: '전체', value: null },
+  { label: '0-3개월', value: 1 },
+  { label: '3-6개월', value: 4 },
+  { label: '6-12개월', value: 8 },
+  { label: '12-24개월', value: 15 },
+  { label: '24개월+', value: 28 },
+]
+
 const PAGE_SIZE = 20
 
 export default function BrowsePage() {
@@ -52,27 +63,43 @@ export default function BrowsePage() {
   const [hasMore, setHasMore] = useState(false)
   const [loading, setLoading] = useState(false)
   const [addedIds, setAddedIds] = useState<Set<number>>(new Set())
-  const [totalCount, setTotalCount] = useState(0)
+
+  // 월령 필터
+  const [myAgeMonths, setMyAgeMonths] = useState<number | null>(null)   // 우리 아이 월령
+  const [selectedAge, setSelectedAge] = useState<number | null>(null)   // 선택된 필터 값
+  const [useMyAge, setUseMyAge] = useState(false)                        // 우리 아이 월령 토글
+
+  // localStorage에서 아이 생년월일 읽기
+  useEffect(() => {
+    const saved = localStorage.getItem('ddokddok_birthdate')
+    if (saved) {
+      setMyAgeMonths(calculateAgeInMonths(saved))
+    }
+  }, [])
 
   const mainCat = CATEGORIES.find(c => c.main === selectedMain)!
+
+  // 실제 쿼리에 넘길 월령 (우리 아이 모드 or 수동 선택)
+  const activeAgeMonths: number | undefined =
+    useMyAge && myAgeMonths !== null ? myAgeMonths :
+    selectedAge !== null ? selectedAge : undefined
 
   const load = useCallback(async (pg: number, reset = false) => {
     setLoading(true)
     const sub = selectedSub ?? undefined
     const { data, hasMore: more } = await fetchMarketProductsByCat(
-      selectedMain, undefined, sub, pg, PAGE_SIZE
+      selectedMain, undefined, sub, pg, PAGE_SIZE, activeAgeMonths
     )
     setProducts(prev => reset ? data : [...prev, ...data])
     setHasMore(more)
     setLoading(false)
-    if (reset) setTotalCount(0) // 정확한 count는 별도 쿼리 필요
-  }, [selectedMain, selectedSub])
+  }, [selectedMain, selectedSub, activeAgeMonths])
 
   useEffect(() => {
     setPage(0)
     setProducts([])
     load(0, true)
-  }, [selectedMain, selectedSub, load])
+  }, [selectedMain, selectedSub, activeAgeMonths, load])
 
   function handleMainChange(main: string) {
     setSelectedMain(main)
@@ -85,11 +112,25 @@ export default function BrowsePage() {
     setPage(0)
   }
 
+  function handleAgeFilter(val: number | null) {
+    setUseMyAge(false)
+    setSelectedAge(val)
+    setPage(0)
+  }
+
+  function handleToggleMyAge() {
+    setUseMyAge(prev => !prev)
+    if (!useMyAge) setSelectedAge(null)
+    setPage(0)
+  }
+
   function loadMore() {
     const next = page + 1
     setPage(next)
     load(next)
   }
+
+  const isAgeFiltered = useMyAge || selectedAge !== null
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -105,9 +146,9 @@ export default function BrowsePage() {
       </nav>
 
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-6">
-        <div className="mb-6">
+        <div className="mb-5">
           <h1 className="text-2xl font-black text-gray-900 mb-1">🛍️ 전체 상품</h1>
-          <p className="text-gray-500 text-sm">수집된 5,000개+ 육아용품을 카테고리별로 탐색하세요</p>
+          <p className="text-gray-500 text-sm">수집된 5,000개+ 육아용품을 카테고리·월령별로 탐색하세요</p>
         </div>
 
         {/* 대분류 탭 */}
@@ -129,7 +170,7 @@ export default function BrowsePage() {
         </div>
 
         {/* 소분류 탭 */}
-        <div className="flex flex-wrap gap-2 mb-6">
+        <div className="flex flex-wrap gap-2 mb-4">
           <button
             onClick={() => handleSubChange(null)}
             className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-all border-2 ${
@@ -151,6 +192,50 @@ export default function BrowsePage() {
           ))}
         </div>
 
+        {/* 월령 필터 */}
+        <div className="bg-white rounded-2xl border-2 border-gray-100 p-4 mb-6">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-sm font-bold text-gray-700">👶 월령별 필터</span>
+            {isAgeFiltered && (
+              <span className="text-xs px-2 py-0.5 rounded-full font-semibold text-white" style={{ background: '#9B7EDE' }}>
+                {useMyAge && myAgeMonths !== null
+                  ? `우리 아이 ${getAgeLabel(myAgeMonths)}`
+                  : AGE_FILTERS.find(f => f.value === selectedAge)?.label}
+              </span>
+            )}
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {/* 우리 아이 월령 버튼 */}
+            {myAgeMonths !== null && (
+              <button
+                onClick={handleToggleMyAge}
+                className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-semibold transition-all border-2 ${
+                  useMyAge
+                    ? 'text-white border-transparent'
+                    : 'border-purple-200 bg-purple-50 text-purple-700 hover:bg-purple-100'
+                }`}
+                style={useMyAge ? { background: 'linear-gradient(to right, #9B7EDE, #B794F6)', borderColor: 'transparent' } : {}}
+              >
+                ✨ 우리 아이 ({getAgeLabel(myAgeMonths)})
+              </button>
+            )}
+            {/* 구간 버튼 */}
+            {AGE_FILTERS.map(f => (
+              <button
+                key={f.label}
+                onClick={() => handleAgeFilter(f.value)}
+                className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-all border-2 ${
+                  !useMyAge && selectedAge === f.value
+                    ? 'border-purple-400 bg-purple-50 text-purple-700'
+                    : 'border-gray-100 bg-white text-gray-600 hover:border-purple-200'
+                }`}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* 상품 그리드 */}
         {loading && products.length === 0 ? (
           <div className="flex items-center justify-center py-20">
@@ -159,17 +244,31 @@ export default function BrowsePage() {
         ) : products.length === 0 ? (
           <div className="text-center py-20 text-gray-400">
             <div className="text-5xl mb-4">📦</div>
-            <p className="font-semibold">해당 카테고리 데이터가 없어요</p>
+            <p className="font-semibold">해당 카테고리·월령 데이터가 없어요</p>
+            {isAgeFiltered && (
+              <button onClick={() => { setUseMyAge(false); setSelectedAge(null); }}
+                className="mt-3 text-sm text-purple-500 underline">
+                월령 필터 해제하기
+              </button>
+            )}
           </div>
         ) : (
           <>
-            <p className="text-xs text-gray-400 mb-4">{products.length}개 표시 중</p>
+            <p className="text-xs text-gray-400 mb-4">
+              {products.length}개 표시 중
+              {isAgeFiltered && (
+                <button onClick={() => { setUseMyAge(false); setSelectedAge(null); }}
+                  className="ml-2 text-purple-400 underline">
+                  필터 해제
+                </button>
+              )}
+            </p>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
               {products.map(mp => {
                 const added = addedIds.has(mp.id)
                 return (
                   <div key={mp.id} className="bg-white rounded-2xl border-2 border-gray-100 overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 flex flex-col">
-                    {/* 이미지 (클릭 → 상세) */}
+                    {/* 이미지 */}
                     <Link href={`/market/${mp.id}`} className="block aspect-square overflow-hidden bg-gray-50">
                       {mp.thumbnail_url ? (
                         <img
@@ -185,6 +284,15 @@ export default function BrowsePage() {
                         <div className="w-full h-full flex items-center justify-center text-4xl">🛍️</div>
                       )}
                     </Link>
+
+                    {/* 월령 뱃지 */}
+                    {(mp.recommended_age_min !== null && mp.recommended_age_min !== undefined) && (
+                      <div className="px-3 pt-2">
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-purple-50 text-purple-600 font-medium">
+                          {mp.recommended_age_min}개월{mp.recommended_age_max ? `~${mp.recommended_age_max}개월` : '+'}
+                        </span>
+                      </div>
+                    )}
 
                     {/* 정보 */}
                     <div className="p-3 flex flex-col flex-1">
