@@ -25,12 +25,18 @@ export default function ChatModal({ isOpen, onClose, ageMonths }: Props) {
   const [streamingContent, setStreamingContent] = useState('')
   const bottomRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const abortRef = useRef<AbortController | null>(null)
 
   // 모달 열릴 때 히스토리 로드
   useEffect(() => {
     if (isOpen) {
       setMessages(loadChatHistory())
-      setTimeout(() => inputRef.current?.focus(), 100)
+      const id = setTimeout(() => inputRef.current?.focus(), 100)
+      return () => clearTimeout(id)
+    } else {
+      abortRef.current?.abort()
+      setIsLoading(false)
+      setStreamingContent('')
     }
   }, [isOpen])
 
@@ -38,6 +44,16 @@ export default function ChatModal({ isOpen, onClose, ageMonths }: Props) {
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, streamingContent])
+
+  // Escape 키로 모달 닫기
+  useEffect(() => {
+    if (!isOpen) return
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+    }
+    window.addEventListener('keyup', handleKeyUp)
+    return () => window.removeEventListener('keyup', handleKeyUp)
+  }, [isOpen, onClose])
 
   const sendMessage = useCallback(async (text: string) => {
     if (!text.trim() || isLoading) return
@@ -51,6 +67,7 @@ export default function ChatModal({ isOpen, onClose, ageMonths }: Props) {
     setStreamingContent('')
 
     try {
+      abortRef.current = new AbortController()
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -58,6 +75,7 @@ export default function ChatModal({ isOpen, onClose, ageMonths }: Props) {
           messages: getApiMessages(nextMessages),
           ageMonths,
         }),
+        signal: abortRef.current.signal,
       })
 
       if (!res.ok) throw new Error('API 오류')
@@ -121,7 +139,12 @@ export default function ChatModal({ isOpen, onClose, ageMonths }: Props) {
       />
 
       {/* 채팅창 */}
-      <div className="relative w-full sm:w-[380px] h-[560px] bg-white rounded-2xl shadow-2xl flex flex-col pointer-events-auto overflow-hidden border border-gray-100">
+      <div
+        className="relative w-full sm:w-[380px] h-[560px] bg-white rounded-2xl shadow-2xl flex flex-col pointer-events-auto overflow-hidden border border-gray-100"
+        role="dialog"
+        aria-modal="true"
+        aria-label="똑똑이 AI 채팅"
+      >
         {/* 헤더 */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100"
              style={{ backgroundColor: '#9B7EDE' }}>
@@ -143,6 +166,7 @@ export default function ChatModal({ isOpen, onClose, ageMonths }: Props) {
             )}
             <button
               onClick={onClose}
+              aria-label="채팅 닫기"
               className="text-white/70 hover:text-white w-7 h-7 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors"
             >
               ✕
@@ -157,7 +181,7 @@ export default function ChatModal({ isOpen, onClose, ageMonths }: Props) {
           ) : (
             <>
               {messages.map((msg, i) => (
-                <ChatMessage key={i} role={msg.role} content={msg.content} />
+                <ChatMessage key={`${msg.role}-${msg.timestamp}-${i}`} role={msg.role} content={msg.content} />
               ))}
               {isLoading && streamingContent && (
                 <ChatMessage role="assistant" content={streamingContent} isStreaming />
@@ -193,6 +217,7 @@ export default function ChatModal({ isOpen, onClose, ageMonths }: Props) {
           <button
             onClick={() => sendMessage(input)}
             disabled={!input.trim() || isLoading}
+            aria-label="메시지 보내기"
             className="w-10 h-10 rounded-xl flex items-center justify-center text-white transition-all disabled:opacity-40 flex-shrink-0"
             style={{ backgroundColor: '#9B7EDE' }}
           >

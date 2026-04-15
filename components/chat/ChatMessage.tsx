@@ -11,7 +11,16 @@ export default function ChatMessage({ role, content, isStreaming }: Props) {
   const isUser = role === 'user'
 
   // **굵게** 마크다운 파싱
-  const formatted = content.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+  function escapeHtml(str: string): string {
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;')
+  }
+
+  const formatted = escapeHtml(content).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
 
   return (
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-3`}>
