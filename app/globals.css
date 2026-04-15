@@ -1,0 +1,34 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-primary: #9B7EDE;
+  --color-accent: #B794F6;
+  --color-secondary: #C4B5FD;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Noto Sans KR', 'Segoe UI', sans-serif;
+  background-color: #FAFAFA;
+  color: #1A1A1A;
+}
+
+@layer utilities {
+  .gradient-primary {
+    background: linear-gradient(to bottom right, #9B7EDE, #B794F6);
+  }
+  .gradient-soft {
+    background: linear-gradient(to bottom right, rgba(155, 126, 222, 0.05), rgba(183, 148, 246, 0.05));
+  }
+  .text-gradient {
+    background: linear-gradient(to right, #9B7EDE, #B794F6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
