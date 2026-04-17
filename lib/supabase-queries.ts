@@ -66,9 +66,10 @@ export async function fetchRecommendations(ageMonths: number): Promise<ProductWi
       ...mapProduct(row),
       priority: getPriority(ageMonths, row.age_min_months as number, row.age_max_months as number),
     }))
+    .filter((p) => p.priority !== 'PASSED')
     .filter((p) => p.priority !== 'LATER' || p.ageMinMonths <= ageMonths + 6)
     .sort((a, b) => {
-      const order = { NOW: 0, SOON: 1, LATER: 2 }
+      const order: Record<string, number> = { NOW: 0, SOON: 1, LATER: 2, PASSED: 3 }
       if (order[a.priority] !== order[b.priority]) return order[a.priority] - order[b.priority]
       const nOrder: Record<string, number> = { ESSENTIAL: 0, SITUATIONAL: 1, OPTIONAL: 2, RENT_OR_USED: 3 }
       return (nOrder[a.necessity] ?? 3) - (nOrder[b.necessity] ?? 3)

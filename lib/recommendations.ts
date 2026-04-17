@@ -25,7 +25,7 @@ export interface Product {
   topProducts?: TopProduct[]
 }
 
-export type Priority = 'NOW' | 'SOON' | 'LATER'
+export type Priority = 'NOW' | 'SOON' | 'LATER' | 'PASSED'
 
 export interface ProductWithPriority extends Product {
   priority: Priority
@@ -48,6 +48,7 @@ export function getAgeLabel(months: number): string {
 export function getPriority(ageMonths: number, ageMin: number, ageMax: number): Priority {
   if (ageMonths >= ageMin && ageMonths <= ageMax) return 'NOW'
   if (ageMonths < ageMin && ageMin - ageMonths <= 2) return 'SOON'
+  if (ageMonths > ageMax) return 'PASSED'
   return 'LATER'
 }
 
@@ -58,9 +59,10 @@ export function getRecommendations(ageMonths: number): ProductWithPriority[] {
       ...product,
       priority: getPriority(ageMonths, product.ageMinMonths, product.ageMaxMonths),
     }))
+    .filter((p) => p.priority !== 'PASSED')
     .filter((p) => p.priority !== 'LATER' || p.ageMinMonths <= ageMonths + 6)
     .sort((a, b) => {
-      const order: Record<Priority, number> = { NOW: 0, SOON: 1, LATER: 2 }
+      const order: Record<Priority, number> = { NOW: 0, SOON: 1, LATER: 2, PASSED: 3 }
       if (order[a.priority] !== order[b.priority]) return order[a.priority] - order[b.priority]
       const necessityOrder: Record<string, number> = { ESSENTIAL: 0, SITUATIONAL: 1, OPTIONAL: 2, RENT_OR_USED: 3 }
       return (necessityOrder[a.necessity] ?? 3) - (necessityOrder[b.necessity] ?? 3)
@@ -77,12 +79,12 @@ export function getDdokFramework(ageGroupSlug: string) {
 }
 
 export function getAgeGroupForMonths(months: number): string {
-  if (months <= 1) return '0-1m'
-  if (months <= 3) return '1-3m'
-  if (months <= 6) return '3-6m'
-  if (months <= 12) return '6-12m'
-  if (months <= 24) return '12-24m'
-  return '24-36m'
+  if (months < 3) return '0-3m'
+  if (months < 6) return '3-6m'
+  if (months < 12) return '6-12m'
+  if (months < 24) return '12-24m'
+  if (months < 36) return '24-36m'
+  return '36m+'
 }
 
 export const NECESSITY_LABELS: Record<string, { label: string; color: string; bg: string }> = {
