@@ -10,11 +10,12 @@ export default function LandingPage() {
   const [birthdate, setBirthdate] = useState('')
   const [error, setError] = useState('')
   const [chatOpen, setChatOpen] = useState(false)
+  const [hasSavedBirthdate, setHasSavedBirthdate] = useState(false)
 
   useEffect(() => {
     const saved = localStorage.getItem('ddokddok_birthdate')
-    if (saved) router.push('/home')
-  }, [router])
+    if (saved) setHasSavedBirthdate(true)
+  }, [])
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -37,11 +38,19 @@ export default function LandingPage() {
             <a href="#categories" className="hover:text-purple-600 transition-colors">카테고리</a>
             <a href="#theory" className="hover:text-purple-600 transition-colors">발달 이론</a>
           </div>
-          <Link href="/home"
-                className="text-sm font-semibold px-5 py-2 rounded-full text-white transition-all hover:shadow-lg"
-                style={{ background: 'linear-gradient(to right, #9B7EDE, #B794F6)' }}>
-            추천 받기
-          </Link>
+          {hasSavedBirthdate ? (
+            <Link href="/home"
+                  className="text-sm font-semibold px-5 py-2 rounded-full text-white transition-all hover:shadow-lg"
+                  style={{ background: 'linear-gradient(to right, #9B7EDE, #B794F6)' }}>
+              마이페이지 →
+            </Link>
+          ) : (
+            <Link href="/home"
+                  className="text-sm font-semibold px-5 py-2 rounded-full text-white transition-all hover:shadow-lg"
+                  style={{ background: 'linear-gradient(to right, #9B7EDE, #B794F6)' }}>
+              추천 받기
+            </Link>
+          )}
         </div>
       </nav>
 
