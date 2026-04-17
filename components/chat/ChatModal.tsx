@@ -6,6 +6,7 @@ import ChatMessage from './ChatMessage'
 import GuidedOpener from './GuidedOpener'
 import {
   type ChatMessage as ChatMsg,
+  type ContextProduct,
   loadChatHistory,
   saveChatHistory,
   clearChatHistory,
@@ -83,12 +84,33 @@ export default function ChatModal({ isOpen, onClose, ageMonths }: Props) {
       const reader = res.body?.getReader()
       const decoder = new TextDecoder()
       let accumulated = ''
+      let relatedProducts: ContextProduct[] = []
+      let metaParsed = false
+      let buffer = ''
 
       if (reader) {
         while (true) {
           const { done, value } = await reader.read()
           if (done) break
-          accumulated += decoder.decode(value, { stream: true })
+          buffer += decoder.decode(value, { stream: true })
+
+          // 첫 줄에서 제품 메타데이터 추출
+          if (!metaParsed) {
+            const newlineIdx = buffer.indexOf('\n')
+            if (newlineIdx !== -1) {
+              const firstLine = buffer.slice(0, newlineIdx)
+              buffer = buffer.slice(newlineIdx + 1)
+              metaParsed = true
+              try {
+                const meta = JSON.parse(firstLine)
+                relatedProducts = meta.__products ?? []
+              } catch { /* 파싱 실패 시 products 없이 진행 */ }
+              accumulated = buffer
+            }
+          } else {
+            accumulated = buffer
+          }
+
           setStreamingContent(accumulated)
         }
       }
@@ -97,6 +119,7 @@ export default function ChatModal({ isOpen, onClose, ageMonths }: Props) {
         role: 'assistant',
         content: accumulated,
         timestamp: Date.now(),
+        products: relatedProducts.length > 0 ? relatedProducts : undefined,
       }
       const finalMessages = [...nextMessages, assistantMsg]
       setMessages(finalMessages)
@@ -181,7 +204,12 @@ export default function ChatModal({ isOpen, onClose, ageMonths }: Props) {
           ) : (
             <>
               {messages.map((msg, i) => (
-                <ChatMessage key={`${msg.role}-${msg.timestamp}-${i}`} role={msg.role} content={msg.content} />
+                <ChatMessage
+                  key={`${msg.role}-${msg.timestamp}-${i}`}
+                  role={msg.role}
+                  content={msg.content}
+                  products={msg.products}
+                />
               ))}
               {isLoading && streamingContent && (
                 <ChatMessage role="assistant" content={streamingContent} isStreaming />

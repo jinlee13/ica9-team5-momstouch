@@ -89,11 +89,14 @@ export async function POST(req: Request) {
     const encoder = new TextEncoder()
     const readable = new ReadableStream({
       async start(controller) {
+        // 첫 줄: 제품 메타데이터 JSON (파싱 후 제거)
+        const meta = JSON.stringify({ __products: contextProducts.slice(0, 3) })
+        controller.enqueue(encoder.encode(meta + '\n'))
+
+        // 이후: AI 텍스트 스트리밍
         for await (const chunk of stream) {
           const text = chunk.choices[0]?.delta?.content ?? ''
-          if (text) {
-            controller.enqueue(encoder.encode(text))
-          }
+          if (text) controller.enqueue(encoder.encode(text))
         }
         controller.close()
       },

@@ -1,8 +1,20 @@
 // lib/chat.ts
+export interface ContextProduct {
+  name: string
+  category_name: string
+  necessity: string
+  price_range: string | null
+  age_min_months: number
+  age_max_months: number
+  reason: string | null
+  image_url?: string | null
+}
+
 export interface ChatMessage {
   role: 'user' | 'assistant'
   content: string
   timestamp: number
+  products?: ContextProduct[]
 }
 
 export interface ChatHistory {
