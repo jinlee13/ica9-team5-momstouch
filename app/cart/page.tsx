@@ -24,10 +24,17 @@ export default function CartPage() {
     return (
       <div className="min-h-screen bg-gray-50">
         <nav className="border-b border-gray-100 bg-white sticky top-0 z-50 shadow-sm">
-          <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
-            <Link href="/home" className="text-xl font-bold" style={{ color: '#9B7EDE' }}>똑똑한 엄마</Link>
+          <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+            <Link href="/" className="text-xl font-bold hover:underline" style={{ color: '#9B7EDE' }}>똑똑한 엄마</Link>
             <div className="flex items-center gap-3">
-              <Link href="/home" className="text-sm text-gray-500 hover:text-purple-600">← 홈</Link>
+              <Link href="/browse"
+                    className="text-sm font-semibold px-4 py-2 rounded-full bg-white border-2 border-gray-200 text-gray-700 shadow-sm hover:border-purple-300 hover:text-purple-600 transition-all">
+                🛍️ 전체상품
+              </Link>
+              <Link href="/home"
+                    className="text-sm font-semibold px-4 py-2 rounded-full bg-white border-2 border-gray-200 text-gray-700 shadow-sm hover:border-purple-300 hover:text-purple-600 transition-all">
+                🏠 마이페이지
+              </Link>
               <CartBadge />
             </div>
           </div>
@@ -50,16 +57,23 @@ export default function CartPage() {
     <div className="min-h-screen bg-gray-50">
       {/* GNB */}
       <nav className="border-b border-gray-100 bg-white sticky top-0 z-50 shadow-sm">
-        <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/home" className="text-xl font-bold" style={{ color: '#9B7EDE' }}>똑똑한 엄마</Link>
+        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+          <Link href="/" className="text-xl font-bold hover:underline" style={{ color: '#9B7EDE' }}>똑똑한 엄마</Link>
           <div className="flex items-center gap-3">
-            <Link href="/home" className="text-sm text-gray-500 hover:text-purple-600">← 홈</Link>
+            <Link href="/browse"
+                  className="text-sm font-semibold px-4 py-2 rounded-full bg-white border-2 border-gray-200 text-gray-700 shadow-sm hover:border-purple-300 hover:text-purple-600 transition-all">
+              🛍️ 전체상품
+            </Link>
+            <Link href="/home"
+                  className="text-sm font-semibold px-4 py-2 rounded-full bg-white border-2 border-gray-200 text-gray-700 shadow-sm hover:border-purple-300 hover:text-purple-600 transition-all">
+              🏠 마이페이지
+            </Link>
             <CartBadge />
           </div>
         </div>
       </nav>
 
-      <div className="max-w-5xl mx-auto px-4 md:px-6 py-8">
+      <div className="max-w-7xl mx-auto px-4 md:px-6 py-8">
         <h1 className="text-2xl font-black text-gray-900 mb-6">🛒 장바구니 <span className="text-lg font-normal text-gray-400">({totalCount}개)</span></h1>
 
         <div className="grid md:grid-cols-3 gap-6">
