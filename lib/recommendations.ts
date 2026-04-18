@@ -15,7 +15,7 @@ export interface Product {
   ageGroupSlug: string
   ageMinMonths: number
   ageMaxMonths: number
-  necessity: 'ESSENTIAL' | 'SITUATIONAL' | 'OPTIONAL' | 'RENT_OR_USED'
+  necessity: 'ESSENTIAL' | 'SITUATIONAL' | 'OPTIONAL'
   reason: string
   developStage: string
   priceRange: string
@@ -64,7 +64,7 @@ export function getRecommendations(ageMonths: number): ProductWithPriority[] {
     .sort((a, b) => {
       const order: Record<Priority, number> = { NOW: 0, SOON: 1, LATER: 2, PASSED: 3 }
       if (order[a.priority] !== order[b.priority]) return order[a.priority] - order[b.priority]
-      const necessityOrder: Record<string, number> = { ESSENTIAL: 0, SITUATIONAL: 1, OPTIONAL: 2, RENT_OR_USED: 3 }
+      const necessityOrder: Record<string, number> = { ESSENTIAL: 0, SITUATIONAL: 1, OPTIONAL: 2 }
       return (necessityOrder[a.necessity] ?? 3) - (necessityOrder[b.necessity] ?? 3)
     })
 }
@@ -91,7 +91,6 @@ export const NECESSITY_LABELS: Record<string, { label: string; color: string; bg
   ESSENTIAL: { label: '필수', color: 'text-purple-700', bg: 'bg-purple-100' },
   SITUATIONAL: { label: '상황형', color: 'text-blue-700', bg: 'bg-blue-100' },
   OPTIONAL: { label: '생략가능', color: 'text-gray-600', bg: 'bg-gray-100' },
-  RENT_OR_USED: { label: '중고·대여', color: 'text-green-700', bg: 'bg-green-100' },
 }
 
 export const CATEGORY_INFO: Record<string, { name: string; icon: string; color: string }> = {

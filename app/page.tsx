@@ -3,18 +3,82 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import ChatModal from '@/components/chat/ChatModal'
+
+const PREVIEW_SLIDES = [
+  {
+    age: '신생아 (0개월)',
+    badge: '🔥 지금 필요',
+    items: [
+      { icon: '🛏️', name: '모빌 (흑백/컬러)', badge: '필수', price: '2~8만원', ddok: 'D·O' },
+      { icon: '👶', name: '속싸개 / 스와들업', badge: '필수', price: '2~5만원', ddok: 'T' },
+      { icon: '🚗', name: '신생아 카시트', badge: '필수', price: '10~30만원', ddok: 'T' },
+    ],
+    progress: '1/4',
+  },
+  {
+    age: '4개월이에요',
+    badge: '🔥 지금 필요',
+    items: [
+      { icon: '🪑', name: '바운서 / 그네', badge: '필수', price: '5~20만원', ddok: 'D·O' },
+      { icon: '🧸', name: '치발기 (실리콘)', badge: '필수', price: '1~3만원', ddok: 'D' },
+      { icon: '🍼', name: '수유쿠션', badge: '권장', price: '2~5만원', ddok: 'T' },
+    ],
+    progress: '2/5',
+  },
+  {
+    age: '7개월이에요',
+    badge: '🔥 지금 필요',
+    items: [
+      { icon: '🛏️', name: '다기능 유아 식탁의자 (하이체어)', badge: '필수', price: '15~40만원', ddok: 'D·T' },
+      { icon: '🍼', name: '이유식 마스터기 (찌기+갈기)', badge: '필수', price: '5~20만원', ddok: 'T' },
+      { icon: '🚗', name: '안전문 (계단·주방 차단)', badge: '필수', price: '5~15만원', ddok: 'D·T' },
+    ],
+    progress: '2/6',
+  },
+  {
+    age: '12개월이에요',
+    badge: '🔥 지금 필요',
+    items: [
+      { icon: '👟', name: '유아 첫 걸음마 신발', badge: '필수', price: '3~7만원', ddok: 'D·T' },
+      { icon: '🧸', name: '소프트 블록 세트', badge: '권장', price: '2~5만원', ddok: 'D·O' },
+      { icon: '🚗', name: '유아 워커 (보행기)', badge: '상황별', price: '5~15만원', ddok: 'D' },
+    ],
+    progress: '3/7',
+  },
+  {
+    age: '24개월이에요',
+    badge: '🔥 지금 필요',
+    items: [
+      { icon: '🛴', name: '킥보드 (유아용)', badge: '권장', price: '5~12만원', ddok: 'D·K' },
+      { icon: '🧸', name: '역할놀이 세트', badge: '권장', price: '3~8만원', ddok: 'O·K' },
+      { icon: '🪑', name: '유아 책상·의자 세트', badge: '권장', price: '10~25만원', ddok: 'O·T' },
+    ],
+    progress: '4/8',
+  },
+]
 
 export default function LandingPage() {
   const router = useRouter()
   const [birthdate, setBirthdate] = useState('')
   const [error, setError] = useState('')
-  const [chatOpen, setChatOpen] = useState(false)
   const [hasSavedBirthdate, setHasSavedBirthdate] = useState(false)
+  const [slideIndex, setSlideIndex] = useState(0)
+  const [transitioning, setTransitioning] = useState(false)
 
   useEffect(() => {
     const saved = localStorage.getItem('ddokddok_birthdate')
     if (saved) setHasSavedBirthdate(true)
+  }, [])
+
+  useEffect(() => {
+    const t = setInterval(() => {
+      setTransitioning(true)
+      setTimeout(() => {
+        setSlideIndex(i => (i + 1) % PREVIEW_SLIDES.length)
+        setTransitioning(false)
+      }, 300)
+    }, 3500)
+    return () => clearInterval(t)
   }, [])
 
   function handleSubmit(e: React.FormEvent) {
@@ -33,24 +97,16 @@ export default function LandingPage() {
       <nav className="border-b border-gray-100 bg-white/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <span className="text-xl font-bold" style={{ color: '#9B7EDE' }}>똑똑한 엄마</span>
-          <div className="hidden md:flex items-center gap-8 text-sm text-gray-600">
-            <a href="#how" className="hover:text-purple-600 transition-colors">서비스 소개</a>
-            <a href="#categories" className="hover:text-purple-600 transition-colors">카테고리</a>
-            <a href="#theory" className="hover:text-purple-600 transition-colors">발달 이론</a>
+          <div className="flex items-center gap-2">
+            <Link href="/browse"
+                  className="text-sm font-semibold px-4 py-2 rounded-full bg-white border-2 border-gray-200 text-gray-700 shadow-sm hover:border-purple-300 hover:text-purple-600 transition-all">
+              🛍️ 전체상품
+            </Link>
+            <Link href="/home"
+                  className="text-sm font-semibold px-4 py-2 rounded-full bg-white border-2 border-gray-200 text-gray-700 shadow-sm hover:border-purple-300 hover:text-purple-600 transition-all">
+              🏠 마이페이지
+            </Link>
           </div>
-          {hasSavedBirthdate ? (
-            <Link href="/home"
-                  className="text-sm font-semibold px-5 py-2 rounded-full text-white transition-all hover:shadow-lg"
-                  style={{ background: 'linear-gradient(to right, #9B7EDE, #B794F6)' }}>
-              마이페이지 →
-            </Link>
-          ) : (
-            <Link href="/home"
-                  className="text-sm font-semibold px-5 py-2 rounded-full text-white transition-all hover:shadow-lg"
-                  style={{ background: 'linear-gradient(to right, #9B7EDE, #B794F6)' }}>
-              추천 받기
-            </Link>
-          )}
         </div>
       </nav>
 
@@ -97,21 +153,6 @@ export default function LandingPage() {
               </form>
               <p className="text-xs text-gray-400">🔒 생년월일은 이 기기에만 저장됩니다. 서버로 전송되지 않아요.</p>
 
-              {/* AI 챗봇 배너 */}
-              <button
-                onClick={() => setChatOpen(true)}
-                className="flex items-center gap-3 px-5 py-3.5 rounded-2xl text-white text-left transition-all hover:opacity-90 active:scale-[0.99] shadow-md w-full max-w-md"
-                style={{ background: 'linear-gradient(135deg, #9B7EDE, #B794F6)' }}
-              >
-                <span className="text-xl flex-shrink-0">🤱</span>
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-sm">AI에게 먼저 물어보세요</p>
-                  <p className="text-purple-100 text-xs">육아용품 추천 · Q&A · 제품 비교</p>
-                </div>
-                <span className="text-purple-200 flex-shrink-0">→</span>
-              </button>
-              <ChatModal isOpen={chatOpen} onClose={() => setChatOpen(false)} ageMonths={0} />
-
               {/* Stats */}
               <div className="flex gap-6 md:gap-8 pt-2">
                 {[
@@ -127,50 +168,73 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Right — Preview Card */}
+            {/* Right — Preview Carousel */}
             <div className="hidden md:block relative">
               <div className="absolute -inset-4 rounded-3xl opacity-20 blur-2xl"
                    style={{ background: 'linear-gradient(135deg, #9B7EDE, #B794F6)' }} />
-              <div className="relative bg-white rounded-3xl shadow-2xl p-6 border border-purple-100">
-                <div className="flex items-center gap-3 mb-5">
-                  <div className="w-10 h-10 rounded-full flex items-center justify-center text-lg"
-                       style={{ background: 'linear-gradient(135deg, #9B7EDE, #B794F6)' }}>
-                    👶
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-400">우리 아이</p>
-                    <p className="font-bold text-gray-800">7개월이에요</p>
-                  </div>
-                  <span className="ml-auto text-xs px-3 py-1 rounded-full font-semibold bg-purple-100 text-purple-700">🔥 지금 필요</span>
-                </div>
-                <div className="space-y-3">
-                  {[
-                    { icon: '🛏️', name: '다기능 유아 식탁의자 (하이체어)', badge: '필수', price: '15~40만원', ddok: 'D·T' },
-                    { icon: '🍼', name: '이유식 마스터기 (찌기+갈기)', badge: '필수', price: '5~20만원', ddok: 'T' },
-                    { icon: '🚗', name: '안전문 (계단·주방 차단)', badge: '필수', price: '5~15만원', ddok: 'D·T' },
-                  ].map((item) => (
-                    <div key={item.name} className="flex items-center gap-3 p-3 rounded-2xl bg-gray-50 hover:bg-purple-50 transition-colors">
-                      <span className="text-xl">{item.icon}</span>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-gray-800 truncate">{item.name}</p>
-                        <p className="text-xs text-gray-400">{item.price}</p>
-                      </div>
-                      <div className="flex flex-col items-end gap-1">
-                        <span className="text-xs px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 font-semibold">{item.badge}</span>
-                        <span className="text-xs text-purple-400 font-bold">{item.ddok}</span>
-                      </div>
+              <div className="relative bg-white rounded-3xl shadow-2xl p-6 border border-purple-100 overflow-hidden">
+                {/* Slide content */}
+                <div
+                  className="transition-all duration-300"
+                  style={{ opacity: transitioning ? 0 : 1, transform: transitioning ? 'translateY(8px)' : 'translateY(0)' }}
+                >
+                  <div className="flex items-center gap-3 mb-5">
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center text-lg"
+                         style={{ background: 'linear-gradient(135deg, #9B7EDE, #B794F6)' }}>
+                      👶
                     </div>
-                  ))}
+                    <div>
+                      <p className="text-xs text-gray-400">우리 아이</p>
+                      <p className="font-bold text-gray-800">{PREVIEW_SLIDES[slideIndex].age}</p>
+                    </div>
+                    <span className="ml-auto text-xs px-3 py-1 rounded-full font-semibold bg-purple-100 text-purple-700">
+                      {PREVIEW_SLIDES[slideIndex].badge}
+                    </span>
+                  </div>
+                  <div className="space-y-3">
+                    {PREVIEW_SLIDES[slideIndex].items.map((item) => (
+                      <div key={item.name} className="flex items-center gap-3 p-3 rounded-2xl bg-gray-50 hover:bg-purple-50 transition-colors">
+                        <span className="text-xl">{item.icon}</span>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-semibold text-gray-800 truncate">{item.name}</p>
+                          <p className="text-xs text-gray-400">{item.price}</p>
+                        </div>
+                        <div className="flex flex-col items-end gap-1">
+                          <span className="text-xs px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 font-semibold">{item.badge}</span>
+                          <span className="text-xs text-purple-400 font-bold">{item.ddok}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-4 pt-4 border-t border-gray-100">
+                    <div className="flex items-center justify-between text-xs text-gray-400 mb-2">
+                      <span>이번 달 필수템 완료율</span>
+                      <span className="font-bold text-purple-600">{PREVIEW_SLIDES[slideIndex].progress}</span>
+                    </div>
+                    <div className="w-full bg-gray-100 rounded-full h-2">
+                      <div className="h-2 rounded-full transition-all duration-500"
+                           style={{
+                             width: `${(parseInt(PREVIEW_SLIDES[slideIndex].progress.split('/')[0]) / parseInt(PREVIEW_SLIDES[slideIndex].progress.split('/')[1])) * 100}%`,
+                             background: 'linear-gradient(to right, #9B7EDE, #B794F6)'
+                           }} />
+                    </div>
+                  </div>
                 </div>
-                <div className="mt-4 pt-4 border-t border-gray-100">
-                  <div className="flex items-center justify-between text-xs text-gray-400 mb-2">
-                    <span>이번 달 필수템 완료율</span>
-                    <span className="font-bold text-purple-600">2/6</span>
-                  </div>
-                  <div className="w-full bg-gray-100 rounded-full h-2">
-                    <div className="h-2 rounded-full w-1/3"
-                         style={{ background: 'linear-gradient(to right, #9B7EDE, #B794F6)' }} />
-                  </div>
+
+                {/* Slide dots */}
+                <div className="flex justify-center gap-1.5 mt-4">
+                  {PREVIEW_SLIDES.map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => { setTransitioning(true); setTimeout(() => { setSlideIndex(i); setTransitioning(false) }, 300) }}
+                      className="rounded-full transition-all duration-300"
+                      style={{
+                        width: i === slideIndex ? '20px' : '6px',
+                        height: '6px',
+                        background: i === slideIndex ? '#9B7EDE' : '#E5E7EB',
+                      }}
+                    />
+                  ))}
                 </div>
               </div>
             </div>

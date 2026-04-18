@@ -72,7 +72,7 @@ export async function fetchRecommendations(ageMonths: number): Promise<ProductWi
     .sort((a, b) => {
       const order: Record<string, number> = { NOW: 0, SOON: 1, LATER: 2, PASSED: 3 }
       if (order[a.priority] !== order[b.priority]) return order[a.priority] - order[b.priority]
-      const nOrder: Record<string, number> = { ESSENTIAL: 0, SITUATIONAL: 1, OPTIONAL: 2, RENT_OR_USED: 3 }
+      const nOrder: Record<string, number> = { ESSENTIAL: 0, SITUATIONAL: 1, OPTIONAL: 2 }
       return (nOrder[a.necessity] ?? 3) - (nOrder[b.necessity] ?? 3)
     })
 }
@@ -272,6 +272,22 @@ export async function fetchMarketProducts(
   results = applyNameFilter(results, categorySub)
 
   return results.slice(0, limit)
+}
+
+export async function fetchMarketProductsBySearch(
+  keyword: string,
+  limit = 60
+): Promise<MarketProduct[]> {
+  if (!keyword.trim()) return []
+  const { data, error } = await supabase
+    .from('market_products')
+    .select('*')
+    .ilike('name', `%${keyword.trim()}%`)
+    .not('thumbnail_url', 'is', null)
+    .order('review_count', { ascending: false, nullsFirst: false })
+    .limit(limit)
+  if (error || !data) return []
+  return data as MarketProduct[]
 }
 
 export async function fetchDdokFramework(ageMonths: number) {
