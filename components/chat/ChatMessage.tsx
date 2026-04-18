@@ -97,7 +97,7 @@ export default function ChatMessage({ role, content, isStreaming, products }: Pr
                 </div>
                 <div className="border-t grid grid-cols-2 divide-x" style={{ borderColor: '#F3EEFF' }}>
                   <a
-                    href="/browse"
+                    href={`/browse?q=${encodeURIComponent(p.name)}`}
                     className="text-xs text-center py-2 text-purple-600 hover:bg-purple-50 transition-colors font-medium"
                   >
                     🔍 상품 보기

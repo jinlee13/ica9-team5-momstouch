@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
+import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { fetchMarketProductsByCat, fetchMarketProductsBySearch, type MarketProduct } from '@/lib/supabase-queries'
 import { cartStore } from '@/lib/cart'
@@ -56,6 +57,7 @@ const AGE_FILTERS = [
 const PAGE_SIZE = 20
 
 export default function BrowsePage() {
+  const searchParams = useSearchParams()
   const [selectedMain, setSelectedMain] = useState(CATEGORIES[0].main)
   const [selectedSub, setSelectedSub] = useState<string | null>(null)
   const [products, setProducts] = useState<MarketProduct[]>([])
@@ -67,11 +69,23 @@ export default function BrowsePage() {
   const [sortOpen, setSortOpen] = useState(false)
 
   // 검색
-  const [searchInput, setSearchInput] = useState('')
-  const [searchQuery, setSearchQuery] = useState('')
+  const initialQ = searchParams.get('q') ?? ''
+  const [searchInput, setSearchInput] = useState(initialQ)
+  const [searchQuery, setSearchQuery] = useState(initialQ)
   const [searchResults, setSearchResults] = useState<MarketProduct[]>([])
   const [searchLoading, setSearchLoading] = useState(false)
   const searchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  // URL ?q= 파라미터로 진입 시 자동 검색
+  useEffect(() => {
+    if (!initialQ.trim()) return
+    setSearchLoading(true)
+    fetchMarketProductsBySearch(initialQ.trim()).then(results => {
+      setSearchResults(results)
+      setSearchLoading(false)
+    })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // 월령 필터
   const [myAgeMonths, setMyAgeMonths] = useState<number | null>(null)   // 우리 아이 월령
