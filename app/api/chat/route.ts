@@ -89,8 +89,8 @@ export async function POST(req: Request) {
     const encoder = new TextEncoder()
     const readable = new ReadableStream({
       async start(controller) {
-        // 첫 줄: 제품 메타데이터 JSON (파싱 후 제거)
-        const meta = JSON.stringify({ __products: contextProducts.slice(0, 3) })
+        // 첫 줄: 제품 메타데이터 JSON (파싱 후 제거) — 전체 목록 전달, 클라이언트에서 필터
+        const meta = JSON.stringify({ __products: contextProducts })
         controller.enqueue(encoder.encode(meta + '\n'))
 
         // 이후: AI 텍스트 스트리밍

@@ -115,11 +115,19 @@ export default function ChatModal({ isOpen, onClose, ageMonths }: Props) {
         }
       }
 
+      // AI 응답에 이름이 부분 언급된 제품만 카드로 표시 (최대 3개)
+      const mentionedProducts = relatedProducts
+        .filter(p => {
+          const words = p.name.split(/\s+/).filter(w => w.length >= 2)
+          return words.some(w => accumulated.includes(w))
+        })
+        .slice(0, 3)
+
       const assistantMsg: ChatMsg = {
         role: 'assistant',
         content: accumulated,
         timestamp: Date.now(),
-        products: relatedProducts.length > 0 ? relatedProducts : undefined,
+        products: mentionedProducts.length > 0 ? mentionedProducts : undefined,
       }
       const finalMessages = [...nextMessages, assistantMsg]
       setMessages(finalMessages)
