@@ -24,9 +24,31 @@ export default function ChatModal({ isOpen, onClose, ageMonths }: Props) {
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [streamingContent, setStreamingContent] = useState('')
+  const [size, setSize] = useState({ width: 380, height: 560 })
   const bottomRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const abortRef = useRef<AbortController | null>(null)
+  const resizing = useRef<{ startX: number; startY: number; startW: number; startH: number; dir: string } | null>(null)
+
+  const startResize = useCallback((e: React.MouseEvent, dir: string) => {
+    e.preventDefault()
+    resizing.current = { startX: e.clientX, startY: e.clientY, startW: size.width, startH: size.height, dir }
+
+    const onMove = (ev: MouseEvent) => {
+      if (!resizing.current) return
+      const { startX, startY, startW, startH, dir: d } = resizing.current
+      const newW = d.includes('w') ? Math.max(320, Math.min(800, startW + (startX - ev.clientX))) : startW
+      const newH = d.includes('n') ? Math.max(400, Math.min(900, startH + (startY - ev.clientY))) : startH
+      setSize({ width: newW, height: newH })
+    }
+    const onUp = () => {
+      resizing.current = null
+      window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('mouseup', onUp)
+    }
+    window.addEventListener('mousemove', onMove)
+    window.addEventListener('mouseup', onUp)
+  }, [size])
 
   // 모달 열릴 때 히스토리 로드
   useEffect(() => {
@@ -171,11 +193,20 @@ export default function ChatModal({ isOpen, onClose, ageMonths }: Props) {
 
       {/* 채팅창 */}
       <div
-        className="relative w-full sm:w-[380px] h-[560px] bg-white rounded-2xl shadow-2xl flex flex-col pointer-events-auto overflow-hidden border border-gray-100"
+        className="relative bg-white rounded-2xl shadow-2xl flex flex-col pointer-events-auto overflow-hidden border border-gray-100 w-full sm:w-auto"
+        style={{ width: typeof window !== 'undefined' && window.innerWidth >= 640 ? size.width : undefined, height: size.height }}
         role="dialog"
         aria-modal="true"
         aria-label="똑똑이 AI 채팅"
       >
+        {/* 리사이즈 핸들: 상단 */}
+        <div className="absolute top-0 left-4 right-0 h-1.5 cursor-n-resize z-20 hidden sm:block" onMouseDown={e => startResize(e, 'n')} />
+        {/* 리사이즈 핸들: 좌측 */}
+        <div className="absolute top-4 left-0 bottom-0 w-1.5 cursor-w-resize z-20 hidden sm:block" onMouseDown={e => startResize(e, 'w')} />
+        {/* 리사이즈 핸들: 좌상단 코너 */}
+        <div className="absolute top-0 left-0 w-4 h-4 cursor-nw-resize z-20 hidden sm:flex items-center justify-center" onMouseDown={e => startResize(e, 'nw')}>
+          <div className="w-2 h-2 rounded-full bg-gray-300 opacity-60" />
+        </div>
         {/* 헤더 */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100"
              style={{ backgroundColor: '#9B7EDE' }}>
