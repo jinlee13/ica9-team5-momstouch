@@ -115,11 +115,19 @@ export default function ChatModal({ isOpen, onClose, ageMonths }: Props) {
         }
       }
 
+      // AI 응답에서 **굵게** 표시된 이름만 추출해 DB 제품과 매칭
+      const boldedNames = (accumulated.match(/\*\*(.+?)\*\*/g) ?? [])
+        .map(m => m.slice(2, -2))
+
+      const mentionedProducts = relatedProducts
+        .filter(p => boldedNames.some(n => p.name.includes(n) || n.includes(p.name)))
+        .slice(0, 3)
+
       const assistantMsg: ChatMsg = {
         role: 'assistant',
         content: accumulated,
         timestamp: Date.now(),
-        products: relatedProducts.length > 0 ? relatedProducts : undefined,
+        products: mentionedProducts.length > 0 ? mentionedProducts : undefined,
       }
       const finalMessages = [...nextMessages, assistantMsg]
       setMessages(finalMessages)
