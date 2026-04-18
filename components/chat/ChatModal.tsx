@@ -115,24 +115,17 @@ export default function ChatModal({ isOpen, onClose, ageMonths }: Props) {
         }
       }
 
-      // AI가 ##PRODUCTS## 마커로 명시한 제품명 추출 후 표시 텍스트에서 제거
-      const MARKER = '##PRODUCTS##'
-      const markerIdx = accumulated.indexOf(MARKER)
-      let displayContent = accumulated
-      let mentionedProducts: ContextProduct[] = []
+      // AI 응답에서 **굵게** 표시된 이름만 추출해 DB 제품과 매칭
+      const boldedNames = (accumulated.match(/\*\*(.+?)\*\*/g) ?? [])
+        .map(m => m.slice(2, -2))
 
-      if (markerIdx !== -1) {
-        const productLine = accumulated.slice(markerIdx + MARKER.length).trim()
-        const names = productLine.split(',').map(n => n.trim()).filter(Boolean)
-        mentionedProducts = relatedProducts
-          .filter(p => names.some(n => p.name.includes(n) || n.includes(p.name)))
-          .slice(0, 3)
-        displayContent = accumulated.slice(0, markerIdx).trim()
-      }
+      const mentionedProducts = relatedProducts
+        .filter(p => boldedNames.some(n => p.name.includes(n) || n.includes(p.name)))
+        .slice(0, 3)
 
       const assistantMsg: ChatMsg = {
         role: 'assistant',
-        content: displayContent,
+        content: accumulated,
         timestamp: Date.now(),
         products: mentionedProducts.length > 0 ? mentionedProducts : undefined,
       }
