@@ -279,10 +279,21 @@ export async function fetchMarketProductsBySearch(
   limit = 60
 ): Promise<MarketProduct[]> {
   if (!keyword.trim()) return []
+
+  // 키워드를 단어 단위로 분해 (& · 공백 · 괄호 기준), 2자 이상만 사용
+  const words = keyword
+    .replace(/[&()\[\]]/g, ' ')
+    .split(/\s+/)
+    .map(w => w.trim())
+    .filter(w => w.length >= 2)
+
+  // 단어 각각을 OR 조건으로 검색 (단어별 ilike → 합집합)
+  const orFilter = words.map(w => `name.ilike.%${w}%`).join(',')
+
   const { data, error } = await supabase
     .from('market_products')
     .select('*')
-    .ilike('name', `%${keyword.trim()}%`)
+    .or(orFilter)
     .not('thumbnail_url', 'is', null)
     .order('review_count', { ascending: false, nullsFirst: false })
     .limit(limit)
