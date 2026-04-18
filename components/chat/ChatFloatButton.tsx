@@ -17,21 +17,22 @@ export default function ChatFloatButton() {
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 z-40 flex items-center gap-2.5 px-4 py-3 rounded-2xl shadow-xl text-white transition-all hover:scale-105 active:scale-95 hover:shadow-2xl"
-        style={{ background: 'linear-gradient(135deg, #9B7EDE, #B794F6)' }}
+        className="fixed bottom-6 right-6 z-40 w-16 h-16 rounded-2xl shadow-xl transition-all hover:scale-105 active:scale-95 hover:shadow-2xl flex items-center justify-center"
+        style={{ background: 'linear-gradient(145deg, #EDE6FF, #D9CCFF)', border: '2.5px solid #9B7EDE' }}
         aria-label="AI 상담 열기"
       >
-        <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center flex-shrink-0">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z" fill="white" opacity="0.3"/>
-            <circle cx="12" cy="12" r="3" fill="white"/>
-            <path d="M12 8v1M12 15v1M8 12H7M17 12h-1M9.17 9.17l-.71-.71M15.54 15.54l-.71-.71M9.17 14.83l-.71.71M15.54 8.46l-.71.71" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
-          </svg>
-        </div>
-        <div className="text-left">
-          <p className="text-xs font-bold leading-tight">AI 상담원</p>
-          <p className="text-purple-100 text-xs leading-tight">육아용품 Q&A</p>
-        </div>
+        <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+          {/* 헤드밴드 */}
+          <path d="M8 18C8 12.477 12.477 8 18 8s10 4.477 10 10" stroke="#9B7EDE" strokeWidth="2.8" strokeLinecap="round" fill="none"/>
+          {/* 왼쪽 이어컵 */}
+          <rect x="5" y="17" width="5" height="8" rx="2.5" fill="#B794F6"/>
+          {/* 오른쪽 이어컵 */}
+          <rect x="26" y="17" width="5" height="8" rx="2.5" fill="#B794F6"/>
+          {/* 마이크 암 */}
+          <path d="M10 25c0 4 3 6 8 6" stroke="#9B7EDE" strokeWidth="2.2" strokeLinecap="round" fill="none"/>
+          {/* 마이크 */}
+          <circle cx="18.5" cy="31.5" r="2" fill="#9B7EDE"/>
+        </svg>
       </button>
 
       <ChatModal
