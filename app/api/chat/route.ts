@@ -2,7 +2,10 @@
 import Groq from 'groq-sdk'
 import { createClient } from '@supabase/supabase-js'
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY })
+function getGroq() {
+  if (!process.env.GROQ_API_KEY) throw new Error('GROQ_API_KEY가 설정되지 않았습니다')
+  return new Groq({ apiKey: process.env.GROQ_API_KEY })
+}
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -35,7 +38,6 @@ function buildSystemPrompt(ageMonths: number, products: Awaited<ReturnType<typeo
     ESSENTIAL: '필수',
     SITUATIONAL: '상황에 따라',
     OPTIONAL: '선택',
-    RENT_OR_USED: '중고·대여 권장',
   }
 
   const productLines = products
@@ -75,7 +77,7 @@ export async function POST(req: Request) {
     const contextProducts = await fetchContextProducts(ageMonths)
     const systemPrompt = buildSystemPrompt(ageMonths, contextProducts)
 
-    const stream = await groq.chat.completions.create({
+    const stream = await getGroq().chat.completions.create({
       model: 'llama-3.3-70b-versatile',
       messages: [
         { role: 'system', content: systemPrompt },

@@ -51,8 +51,9 @@ export async function fetchMarketProductsByCat(
     .range(page * pageSize, (page + 1) * pageSize)
 
   if (error) return { data: [], hasMore: false }
+  const filtered = applyNameFilter((data ?? []) as MarketProduct[], sub ?? null)
   return {
-    data: (data ?? []) as MarketProduct[],
+    data: filtered,
     hasMore: (data?.length ?? 0) > pageSize,
   }
 }
@@ -71,7 +72,7 @@ export async function fetchRecommendations(ageMonths: number): Promise<ProductWi
     .sort((a, b) => {
       const order: Record<string, number> = { NOW: 0, SOON: 1, LATER: 2, PASSED: 3 }
       if (order[a.priority] !== order[b.priority]) return order[a.priority] - order[b.priority]
-      const nOrder: Record<string, number> = { ESSENTIAL: 0, SITUATIONAL: 1, OPTIONAL: 2, RENT_OR_USED: 3 }
+      const nOrder: Record<string, number> = { ESSENTIAL: 0, SITUATIONAL: 1, OPTIONAL: 2 }
       return (nOrder[a.necessity] ?? 3) - (nOrder[b.necessity] ?? 3)
     })
 }
@@ -169,6 +170,60 @@ export const PRODUCT_TO_CATEGORY_SUB: Record<string, string> = {
   '12-24m-sleep-1': '구강케어',        // 유아용 칫솔 & 치약
 }
 
+// 카테고리별 상품명 필터 규칙
+// include: 해당 키워드 중 하나라도 포함해야 표시
+// exclude: 해당 키워드 중 하나라도 포함하면 제외
+const CAT_INCLUDE: Record<string, string[]> = {
+  // 자기·위생
+  '속싸개·스와들':      ['속싸개', '스와들'],
+  '신생아침대·범퍼침대': ['침대', '범퍼', '바구니침대', '크리브', '베이넷'],
+  '수면조명·자장가':    ['수면등', '조명', '자장가', '무드등', '오르골'],
+  '기저귀':            ['기저귀'],
+  '물티슈':            ['물티슈'],
+  '손수건':            ['손수건', '거즈수건', '거즈손수건'],
+  '세제·세탁':         ['세제', '세탁', '섬유유연제', '클리너'],
+  '구강케어':          ['칫솔', '치약', '구강', '불소'],
+  '스킨케어':          ['로션', '크림', '오일', '선크림', '선스크린', '모이스처', '스킨케어'],
+  '베이비케어':        ['체온계', '손톱', '코흡입기', '귀이개', '배냇저고리', '솜이불'],
+  // 먹기
+  '젖병':              ['젖병'],
+  '젖병 액세서리':     ['젖꼭지', '젖병솔', '세척', '소독기', '젖병 액세서리', '브러시'],
+  '분유':              ['분유', '산양유'],
+  '수유쿠션':          ['수유쿠션', '수유베개'],
+  '이유식':            ['이유식'],
+  '아기식기':          ['식기', '스푼', '숟가락', '포크', '그릇', '흡착', '빨대컵', 'sippy', '보울'],
+  '이유식메이커':      ['이유식메이커', '블렌더', '다지기', '스팀', '이유식기'],
+  // 놀기·배우기
+  '치발기':            ['치발기'],
+  '모빌':              ['모빌'],
+  '감각발달완구':      ['촉감', '헝겊', '감각', '딸랑이', '러닝홈', '플레이매트', '짐', '매트'],
+  '촉감책(헝겊책)':   ['촉감책', '헝겊책'],
+  // 외출·안전
+  '유모차':            ['유모차'],
+  '아기띠·슬링':       ['아기띠', '슬링', '힙시트'],
+  '카시트':            ['카시트'],
+  '안전게이트':        ['게이트', '안전문', '안전게이트'],
+  '모서리보호대':      ['모서리', '모서리보호', '안전커버'],
+}
+const CAT_EXCLUDE: Record<string, string[]> = {
+  '아기띠·슬링': ['유모차'],
+  '여행용품':    ['유모차', '카시트'],
+}
+
+function applyNameFilter(items: MarketProduct[], categorySub: string | null | undefined): MarketProduct[] {
+  if (!categorySub) return items
+  const exclude = CAT_EXCLUDE[categorySub]
+  const include = CAT_INCLUDE[categorySub]
+  let result = items
+  if (exclude?.length) {
+    result = result.filter(mp => !exclude.some(kw => mp.name.includes(kw)))
+  }
+  if (include?.length) {
+    result = result.filter(mp => include.some(kw => mp.name.includes(kw)))
+  }
+  return result
+}
+
 // "0-6개월", "6~12개월", "신생아" 등 텍스트 → {min, max} 파싱
 function parseAgeRange(ageStr: string | null): { min: number; max: number } | null {
   if (!ageStr) return null
@@ -213,7 +268,26 @@ export async function fetchMarketProducts(
     if (ageFiltered.length > 0) results = ageFiltered
   }
 
+  // 카테고리별 상품명 필터
+  results = applyNameFilter(results, categorySub)
+
   return results.slice(0, limit)
+}
+
+export async function fetchMarketProductsBySearch(
+  keyword: string,
+  limit = 60
+): Promise<MarketProduct[]> {
+  if (!keyword.trim()) return []
+  const { data, error } = await supabase
+    .from('market_products')
+    .select('*')
+    .ilike('name', `%${keyword.trim()}%`)
+    .not('thumbnail_url', 'is', null)
+    .order('review_count', { ascending: false, nullsFirst: false })
+    .limit(limit)
+  if (error || !data) return []
+  return data as MarketProduct[]
 }
 
 export async function fetchDdokFramework(ageMonths: number) {

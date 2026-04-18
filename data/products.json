@@ -168,8 +168,8 @@
       "categoryName": "외출·안전",
       "ageGroupSlug": "0-3m",
       "ageMinMonths": 0,
-      "ageMaxMonths": 6,
-      "necessity": "RENT_OR_USED",
+      "ageMaxMonths": 3,
+      "necessity": "OPTIONAL",
       "reason": "평평하게 눕힐 수 있는 바구니형이 신생아 척추 보호에 적합합니다.",
       "developStage": "반사운동기",
       "priceRange": "200,000~800,000원",
@@ -178,7 +178,7 @@
         "D",
         "T"
       ],
-      "theoryNote": "사용 기간이 짧아 중고·대여를 적극 권장합니다."
+      "theoryNote": "사용 기간이 짧아 필요에 따라 선택하세요."
     },
     {
       "id": "0-1m-play-1",
@@ -351,8 +351,8 @@
       "categorySlug": "outdoor",
       "categoryName": "외출·안전",
       "ageGroupSlug": "0-3m",
-      "ageMinMonths": 1,
-      "ageMaxMonths": 3,
+      "ageMinMonths": 3,
+      "ageMaxMonths": 24,
       "necessity": "ESSENTIAL",
       "reason": "100일 이후 외출 빈도 증가에 대비하는 장거리 외출 필수템입니다.",
       "developStage": "장거리 외출 필수템",
@@ -1409,8 +1409,8 @@
       "ageGroupSlug": "24-36m",
       "ageMinMonths": 24,
       "ageMaxMonths": 36,
-      "necessity": "RENT_OR_USED",
-      "reason": "대근육 발달과 균형감각을 키웁니다. 크고 비싸므로 대여·중고를 권장합니다.",
+      "necessity": "OPTIONAL",
+      "reason": "대근육 발달과 균형감각을 키웁니다.",
       "developStage": "대근육 발달",
       "priceRange": "100,000~500,000원",
       "kcCertified": true,

@@ -43,6 +43,8 @@ export default function HomePage() {
   const [ddok, setDdok] = useState<{ label: string; subtitle: string; reason_template: string } | null>(null)
   const [chatOpen, setChatOpen] = useState(false)
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('ALL')
+  const [editingBirthdate, setEditingBirthdate] = useState(false)
+  const [tempBirthdate, setTempBirthdate] = useState('')
 
   useEffect(() => {
     const saved = localStorage.getItem('ddokddok_birthdate')
@@ -57,6 +59,21 @@ export default function HomePage() {
     )
     fetchDdokFramework(months).then(setDdok)
   }, [router])
+
+  function handleBirthdateUpdate(e: React.FormEvent) {
+    e.preventDefault()
+    if (!tempBirthdate) return
+    if (new Date(tempBirthdate) > new Date()) return
+    localStorage.setItem('ddokddok_birthdate', tempBirthdate)
+    setBirthdate(tempBirthdate)
+    const months = calculateAgeInMonths(tempBirthdate)
+    setAgeMonths(months)
+    setEditingBirthdate(false)
+    fetchRecommendations(months).then(all =>
+      setProducts(all.filter(p => p.id in PRODUCT_TO_CATEGORY_SUB))
+    )
+    fetchDdokFramework(months).then(setDdok)
+  }
 
   function updateStatus(id: string, status: string) {
     const next = { ...checklistState }
@@ -100,43 +117,16 @@ export default function HomePage() {
       {/* GNB */}
       <nav className="border-b border-gray-100 bg-white sticky top-0 z-50 shadow-sm">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/home" className="text-xl font-bold" style={{ color: '#9B7EDE' }}>똑똑한 엄마</Link>
+          <Link href="/" className="text-xl font-bold hover:underline" style={{ color: '#9B7EDE' }}>똑똑한 엄마</Link>
           <div className="flex items-center gap-2 md:gap-4">
-            <span className="hidden sm:block text-sm text-gray-500">
-              우리 아이: <strong className="text-gray-800">{getAgeLabel(ageMonths)}</strong>
-            </span>
-            <span className="sm:hidden text-sm font-bold" style={{ color: '#9B7EDE' }}>{getAgeLabel(ageMonths)}</span>
             <Link href="/browse"
-                  className="text-sm font-semibold px-3 md:px-4 py-2 rounded-full border-2 border-gray-200 text-gray-600 hover:border-purple-200 hover:text-purple-600 transition-colors">
-              🛍️ <span className="hidden sm:inline">전체 상품</span>
+                  className="text-sm font-semibold px-4 py-2 rounded-full bg-white border-2 border-gray-200 text-gray-700 shadow-sm hover:border-purple-300 hover:text-purple-600 transition-all">
+              🛍️ <span className="hidden sm:inline">전체상품</span>
             </Link>
             <CartBadge />
-            <Link
-              href="/"
-              className="text-xs text-gray-400 hover:text-purple-600 border border-gray-200 rounded-full px-2 md:px-3 py-1.5 transition-colors font-semibold">
-              🏠 <span className="hidden sm:inline">Home</span>
-            </Link>
           </div>
         </div>
       </nav>
-
-      {/* AI 챗봇 배너 */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-4">
-        <button
-          onClick={() => setChatOpen(true)}
-          className="w-full flex items-center gap-3 px-5 py-4 rounded-2xl text-white text-left transition-all hover:opacity-90 active:scale-[0.99] shadow-md"
-          style={{ background: 'linear-gradient(135deg, #9B7EDE, #B794F6)' }}
-        >
-          <span className="text-2xl flex-shrink-0">🤱</span>
-          <div className="flex-1 min-w-0">
-            <p className="font-semibold text-sm">AI에게 물어보세요</p>
-            <p className="text-purple-100 text-xs truncate">
-              {ageMonths}개월 맞춤 추천 · 육아 Q&A · 제품 비교
-            </p>
-          </div>
-          <span className="text-purple-200 text-lg flex-shrink-0">→</span>
-        </button>
-      </div>
 
       {/* ChatModal */}
       <ChatModal isOpen={chatOpen} onClose={() => setChatOpen(false)} ageMonths={ageMonths} />
@@ -144,16 +134,39 @@ export default function HomePage() {
       <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Page Header */}
         <div className="mb-8">
-          <div className="grid md:grid-cols-3 gap-5">
+          <div className="grid md:grid-cols-2 gap-5">
             {/* Age Card */}
-            <div className="md:col-span-2 rounded-3xl p-7 text-white relative overflow-hidden"
+            <div className="rounded-3xl p-5 text-white relative overflow-hidden"
                  style={{ background: 'linear-gradient(135deg, #9B7EDE 0%, #B794F6 100%)' }}>
-              <div className="absolute top-0 right-0 w-40 h-40 rounded-full opacity-10"
+              <div className="absolute top-0 right-0 w-32 h-32 rounded-full opacity-10"
                    style={{ background: 'white', transform: 'translate(30%, -30%)' }} />
               <p className="text-purple-100 text-sm font-medium mb-1">우리 아이는 지금</p>
-              <h1 className="text-4xl font-black mb-4">{getAgeLabel(ageMonths)} <span className="text-2xl font-normal">이에요</span></h1>
+              {editingBirthdate ? (
+                <form onSubmit={handleBirthdateUpdate} className="mb-3">
+                  <div className="flex gap-2 items-center flex-wrap">
+                    <input
+                      type="date"
+                      value={tempBirthdate}
+                      onChange={(e) => setTempBirthdate(e.target.value)}
+                      max={new Date().toISOString().split('T')[0]}
+                      className="px-3 py-2 rounded-xl text-gray-800 text-sm font-semibold focus:outline-none bg-white/90 flex-1 min-w-0"
+                    />
+                    <button type="submit" className="px-3 py-2 rounded-xl bg-white/20 text-white text-sm font-bold hover:bg-white/30 transition-all whitespace-nowrap">확인</button>
+                    <button type="button" onClick={() => setEditingBirthdate(false)} className="px-3 py-2 rounded-xl bg-white/10 text-white/70 text-sm hover:bg-white/20 transition-all">취소</button>
+                  </div>
+                </form>
+              ) : (
+                <div className="flex items-center gap-3 mb-3">
+                  <h1 className="text-3xl font-black">{getAgeLabel(ageMonths)} <span className="text-xl font-normal">이에요</span></h1>
+                  <button
+                    onClick={() => { setTempBirthdate(birthdate ?? ''); setEditingBirthdate(true) }}
+                    className="text-xs px-3 py-1.5 rounded-full bg-white/20 text-white hover:bg-white/30 transition-all font-semibold whitespace-nowrap">
+                    ✏️ 수정
+                  </button>
+                </div>
+              )}
               {ddok && (
-                <div className="bg-white/20 rounded-2xl p-4">
+                <div className="bg-white/20 rounded-2xl p-3">
                   <p className="text-xs text-purple-100 font-semibold mb-1">🧠 DDOK 발달 나침반 · {ddok.label}</p>
                   <p className="text-sm text-white font-medium">{ddok.subtitle}</p>
                   <p className="text-xs text-purple-100 mt-1 leading-relaxed line-clamp-2">{ddok.reason_template}</p>
@@ -181,19 +194,19 @@ export default function HomePage() {
               </div>
 
               {/* 상태 탭 */}
-              <div className="flex flex-wrap gap-1 mb-3">
+              <div className="grid grid-cols-5 gap-1 mb-3 w-full">
                 {STATUS_TABS.map((tab) => {
                   const isActive = statusFilter === tab.key
                   return (
                     <button
                       key={tab.key}
                       onClick={() => setStatusFilter(tab.key)}
-                      className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all border ${
+                      className={`flex flex-col items-center justify-center gap-0.5 py-2 rounded-lg text-xs font-semibold transition-all border w-full ${
                         isActive ? 'text-white border-transparent shadow-sm' : 'bg-gray-50 text-gray-500 border-gray-200 hover:border-purple-300'
                       }`}
                       style={isActive ? { background: 'linear-gradient(to right, #9B7EDE, #B794F6)' } : {}}>
-                      {tab.label}
-                      <span className={`text-xs px-1 py-0.5 rounded-full font-bold ${isActive ? 'bg-white/20 text-white' : 'bg-gray-200 text-gray-500'}`}>
+                      <span>{tab.label}</span>
+                      <span className={`text-xs font-bold ${isActive ? 'text-white/90' : 'text-gray-400'}`}>
                         {tab.count}
                       </span>
                     </button>
@@ -201,44 +214,6 @@ export default function HomePage() {
                 })}
               </div>
 
-              {/* 상품 리스트 */}
-              <div className="flex-1 overflow-y-auto max-h-52 space-y-2 pr-1">
-                {checklistFiltered.length === 0 ? (
-                  <p className="text-xs text-gray-400 text-center py-4">해당 아이템 없음</p>
-                ) : (
-                  checklistFiltered.map((p) => {
-                    const status = checklistState[p.id] ?? ''
-                    return (
-                      <div key={p.id} className={`rounded-xl border p-2.5 transition-all ${
-                        status === 'BOUGHT' ? 'border-green-200 bg-green-50' :
-                        status === 'PENDING' ? 'border-yellow-200 bg-yellow-50' :
-                        status === 'SKIP' ? 'border-red-100 bg-red-50' :
-                        'border-gray-100 bg-white'
-                      }`}>
-                        <p className={`text-xs font-semibold mb-2 leading-snug ${status === 'BOUGHT' ? 'line-through text-gray-400' : 'text-gray-700'}`}>
-                          {p.name}
-                        </p>
-                        <div className="flex gap-1">
-                          {[
-                            { key: 'BOUGHT', label: '✅', active: 'bg-green-100 text-green-700 border-green-300' },
-                            { key: 'PENDING', label: '⏳', active: 'bg-yellow-100 text-yellow-700 border-yellow-300' },
-                            { key: 'SKIP', label: '🚫', active: 'bg-red-50 text-red-500 border-red-200' },
-                          ].map((btn) => (
-                            <button
-                              key={btn.key}
-                              onClick={() => updateStatus(p.id, status === btn.key ? '' : btn.key)}
-                              className={`flex-1 py-1 rounded-lg text-xs font-bold border transition-all ${
-                                status === btn.key ? btn.active : 'bg-gray-50 text-gray-400 border-gray-100 hover:border-gray-300'
-                              }`}>
-                              {btn.label}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    )
-                  })
-                )}
-              </div>
             </div>
           </div>
         </div>
