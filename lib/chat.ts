@@ -32,7 +32,8 @@ export function loadChatHistory(): ChatMessage[] {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (!raw) return []
     const history: ChatHistory = JSON.parse(raw)
-    return history.messages ?? []
+    // products는 캐시 버전 불일치 방지를 위해 로드 시 제거 (응답 시 재계산됨)
+    return (history.messages ?? []).map(({ products: _p, ...msg }) => msg)
   } catch {
     return []
   }
