@@ -30,6 +30,8 @@ const CATEGORY_TABS = [
   { key: 'outdoor', label: '외출·안전', icon: '🚗' },
 ]
 
+type StatusFilter = 'ALL' | 'BOUGHT' | 'PENDING' | 'SKIP' | 'NONE'
+
 export default function HomePage() {
   const router = useRouter()
   const [birthdate, setBirthdate] = useState<string | null>(null)
@@ -40,6 +42,7 @@ export default function HomePage() {
   const [checklistState, setChecklistState] = useState<Record<string, string>>({})
   const [ddok, setDdok] = useState<{ label: string; subtitle: string; reason_template: string } | null>(null)
   const [chatOpen, setChatOpen] = useState(false)
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('ALL')
 
   useEffect(() => {
     const saved = localStorage.getItem('ddokddok_birthdate')
@@ -55,15 +58,40 @@ export default function HomePage() {
     fetchDdokFramework(months).then(setDdok)
   }, [router])
 
+  function updateStatus(id: string, status: string) {
+    const next = { ...checklistState }
+    if (status) next[id] = status
+    else delete next[id]
+    setChecklistState(next)
+    localStorage.setItem('ddokddok_checklist', JSON.stringify(next))
+  }
+
   const filtered = products.filter((p) => {
     if (p.priority !== activeTab) return false
     if (activeCategory !== 'all' && p.categorySlug !== activeCategory) return false
     return true
   })
 
-  const nowCount = products.filter((p) => p.priority === 'NOW').length
-  const boughtCount = Object.values(checklistState).filter((v) => v === 'BOUGHT').length
+  const nowProducts = products.filter((p) => p.priority === 'NOW')
+  const boughtCount = nowProducts.filter((p) => checklistState[p.id] === 'BOUGHT').length
+  const pendingCount = nowProducts.filter((p) => checklistState[p.id] === 'PENDING').length
+  const skipCount = nowProducts.filter((p) => checklistState[p.id] === 'SKIP').length
+  const noneCount = nowProducts.filter((p) => !checklistState[p.id]).length
   const soonProducts = products.filter((p) => p.priority === 'SOON').slice(0, 3)
+
+  const STATUS_TABS: { key: StatusFilter; label: string; count: number }[] = [
+    { key: 'ALL', label: '전체', count: nowProducts.length },
+    { key: 'NONE', label: '미체크', count: noneCount },
+    { key: 'BOUGHT', label: '✅ 완료', count: boughtCount },
+    { key: 'PENDING', label: '⏳ 보류', count: pendingCount },
+    { key: 'SKIP', label: '🚫 생략', count: skipCount },
+  ]
+
+  const checklistFiltered = nowProducts.filter((p) => {
+    if (statusFilter === 'ALL') return true
+    if (statusFilter === 'NONE') return !checklistState[p.id]
+    return checklistState[p.id] === statusFilter
+  })
 
   if (!birthdate) return null
 
@@ -82,21 +110,12 @@ export default function HomePage() {
                   className="text-sm font-semibold px-3 md:px-4 py-2 rounded-full border-2 border-gray-200 text-gray-600 hover:border-purple-200 hover:text-purple-600 transition-colors">
               🛍️ <span className="hidden sm:inline">전체 상품</span>
             </Link>
-            <Link href="/checklist"
-                  className="text-sm font-semibold px-3 md:px-4 py-2 rounded-full border-2 border-purple-200 text-purple-600 hover:bg-purple-50 transition-colors">
-              ✅ <span className="hidden sm:inline">체크리스트</span>
-            </Link>
             <CartBadge />
-            <button
-              onClick={() => {
-                if (confirm('생년월일을 변경하면 초기화됩니다. 계속하시겠어요?')) {
-                  localStorage.removeItem('ddokddok_birthdate')
-                  router.push('/')
-                }
-              }}
-              className="text-xs text-gray-400 hover:text-gray-600 border border-gray-200 rounded-full px-2 md:px-3 py-1.5 transition-colors">
-              ⚙️ <span className="hidden sm:inline">생년월일 변경</span>
-            </button>
+            <Link
+              href="/"
+              className="text-xs text-gray-400 hover:text-purple-600 border border-gray-200 rounded-full px-2 md:px-3 py-1.5 transition-colors font-semibold">
+              🏠 <span className="hidden sm:inline">Home</span>
+            </Link>
           </div>
         </div>
       </nav>
@@ -142,25 +161,84 @@ export default function HomePage() {
               )}
             </div>
 
-            {/* Progress Card */}
-            <div className="bg-white rounded-3xl p-6 border-2 border-gray-100 shadow-sm">
-              <h3 className="text-sm font-bold text-gray-700 mb-4">이번 달 필수템 완료</h3>
-              <div className="text-center mb-4">
-                <span className="text-5xl font-black" style={{ color: '#9B7EDE' }}>{boughtCount}</span>
-                <span className="text-2xl text-gray-300 mx-2">/</span>
-                <span className="text-2xl font-bold text-gray-400">{nowCount}</span>
+            {/* 상품 구매 현황 Card */}
+            <div className="bg-white rounded-3xl p-6 border-2 border-gray-100 shadow-sm flex flex-col">
+              <h3 className="text-sm font-bold text-gray-700 mb-3">상품 구매 현황</h3>
+
+              {/* 완료율 */}
+              <div className="text-center mb-3">
+                <span className="text-4xl font-black" style={{ color: '#9B7EDE' }}>{boughtCount}</span>
+                <span className="text-xl text-gray-300 mx-2">/</span>
+                <span className="text-xl font-bold text-gray-400">{nowProducts.length}</span>
+                <span className="text-xs text-gray-400 block mt-0.5">구매 완료</span>
               </div>
-              <div className="w-full bg-gray-100 rounded-full h-3 mb-4">
-                <div className="h-3 rounded-full transition-all duration-700"
+              <div className="w-full bg-gray-100 rounded-full h-2 mb-4">
+                <div className="h-2 rounded-full transition-all duration-700"
                      style={{
-                       width: nowCount > 0 ? `${(boughtCount / nowCount) * 100}%` : '0%',
+                       width: nowProducts.length > 0 ? `${(boughtCount / nowProducts.length) * 100}%` : '0%',
                        background: 'linear-gradient(to right, #9B7EDE, #B794F6)'
                      }} />
               </div>
-              <Link href="/checklist"
-                    className="block w-full py-2.5 text-center text-sm font-semibold rounded-xl border-2 border-purple-200 text-purple-600 hover:bg-purple-50 transition-colors">
-                체크리스트 관리 →
-              </Link>
+
+              {/* 상태 탭 */}
+              <div className="flex flex-wrap gap-1 mb-3">
+                {STATUS_TABS.map((tab) => {
+                  const isActive = statusFilter === tab.key
+                  return (
+                    <button
+                      key={tab.key}
+                      onClick={() => setStatusFilter(tab.key)}
+                      className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all border ${
+                        isActive ? 'text-white border-transparent shadow-sm' : 'bg-gray-50 text-gray-500 border-gray-200 hover:border-purple-300'
+                      }`}
+                      style={isActive ? { background: 'linear-gradient(to right, #9B7EDE, #B794F6)' } : {}}>
+                      {tab.label}
+                      <span className={`text-xs px-1 py-0.5 rounded-full font-bold ${isActive ? 'bg-white/20 text-white' : 'bg-gray-200 text-gray-500'}`}>
+                        {tab.count}
+                      </span>
+                    </button>
+                  )
+                })}
+              </div>
+
+              {/* 상품 리스트 */}
+              <div className="flex-1 overflow-y-auto max-h-52 space-y-2 pr-1">
+                {checklistFiltered.length === 0 ? (
+                  <p className="text-xs text-gray-400 text-center py-4">해당 아이템 없음</p>
+                ) : (
+                  checklistFiltered.map((p) => {
+                    const status = checklistState[p.id] ?? ''
+                    return (
+                      <div key={p.id} className={`rounded-xl border p-2.5 transition-all ${
+                        status === 'BOUGHT' ? 'border-green-200 bg-green-50' :
+                        status === 'PENDING' ? 'border-yellow-200 bg-yellow-50' :
+                        status === 'SKIP' ? 'border-red-100 bg-red-50' :
+                        'border-gray-100 bg-white'
+                      }`}>
+                        <p className={`text-xs font-semibold mb-2 leading-snug ${status === 'BOUGHT' ? 'line-through text-gray-400' : 'text-gray-700'}`}>
+                          {p.name}
+                        </p>
+                        <div className="flex gap-1">
+                          {[
+                            { key: 'BOUGHT', label: '✅', active: 'bg-green-100 text-green-700 border-green-300' },
+                            { key: 'PENDING', label: '⏳', active: 'bg-yellow-100 text-yellow-700 border-yellow-300' },
+                            { key: 'SKIP', label: '🚫', active: 'bg-red-50 text-red-500 border-red-200' },
+                          ].map((btn) => (
+                            <button
+                              key={btn.key}
+                              onClick={() => updateStatus(p.id, status === btn.key ? '' : btn.key)}
+                              className={`flex-1 py-1 rounded-lg text-xs font-bold border transition-all ${
+                                status === btn.key ? btn.active : 'bg-gray-50 text-gray-400 border-gray-100 hover:border-gray-300'
+                              }`}>
+                              {btn.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )
+                  })
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -282,6 +360,7 @@ export default function HomePage() {
                     product={product}
                     checklistState={checklistState}
                     ageMonths={ageMonths}
+                    onStatusChange={updateStatus}
                   />
                 ))}
               </div>
@@ -317,12 +396,13 @@ function ProductCard({
   product,
   checklistState,
   ageMonths,
+  onStatusChange,
 }: {
   product: ProductWithPriority
   checklistState: Record<string, string>
   ageMonths: number
+  onStatusChange: (id: string, status: string) => void
 }) {
-  const router = useRouter()
   const necessity = NECESSITY_LABELS[product.necessity]
   const category = CATEGORY_INFO[product.categorySlug]
   const status = checklistState[product.id]
@@ -344,6 +424,14 @@ function ProductCard({
     status === 'PENDING' ? '⏳ 보류' :
     status === 'SKIP' ? '🚫 생략' :
     '☑️ 체크'
+
+  function cycleStatus() {
+    const next =
+      !status ? 'BOUGHT' :
+      status === 'BOUGHT' ? 'PENDING' :
+      status === 'PENDING' ? 'SKIP' : ''
+    onStatusChange(product.id, next)
+  }
 
   return (
     <div className={`bg-white rounded-2xl border-2 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col overflow-hidden ${statusStyle}`}>
@@ -399,7 +487,7 @@ function ProductCard({
             자세히
           </Link>
           <button
-            onClick={() => router.push('/checklist')}
+            onClick={cycleStatus}
             className={`flex-1 py-2.5 text-center text-sm font-semibold rounded-xl border-2 transition-all ${checkBtnStyle}`}>
             {checkBtnLabel}
           </button>
