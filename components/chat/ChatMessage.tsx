@@ -97,7 +97,13 @@ export default function ChatMessage({ role, content, isStreaming, products }: Pr
                 </div>
                 <div className="border-t grid grid-cols-2 divide-x" style={{ borderColor: '#F3EEFF' }}>
                   <a
-                    href={`/browse?q=${encodeURIComponent(p.name)}`}
+                    href={`/browse?q=${encodeURIComponent(
+                      // & 구분 복합명은 가장 긴 토큰을, 괄호 이후 제거
+                      p.name
+                        .split('&')
+                        .map(s => s.replace(/\s*\(.*\)/, '').trim())
+                        .sort((a, b) => b.length - a.length)[0]
+                    )}`}
                     className="text-xs text-center py-2 text-purple-600 hover:bg-purple-50 transition-colors font-medium"
                   >
                     🔍 상품 보기
