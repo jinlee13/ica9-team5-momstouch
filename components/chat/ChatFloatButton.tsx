@@ -22,10 +22,12 @@ export default function ChatFloatButton() {
         aria-label="AI 상담 열기"
       >
         <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center flex-shrink-0">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z" fill="white" opacity="0.3"/>
-            <circle cx="12" cy="12" r="3" fill="white"/>
-            <path d="M12 8v1M12 15v1M8 12H7M17 12h-1M9.17 9.17l-.71-.71M15.54 15.54l-.71-.71M9.17 14.83l-.71.71M15.54 8.46l-.71.71" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+          <svg width="22" height="22" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M9 22C9 14.82 13.925 9 20 9s11 5.82 11 13" stroke="white" strokeWidth="3" strokeLinecap="round" fill="none"/>
+            <rect x="5" y="20" width="7" height="10" rx="3.5" fill="white"/>
+            <rect x="28" y="20" width="7" height="10" rx="3.5" fill="white"/>
+            <path d="M12 30c0 4.5 3.5 7 8 7" stroke="white" strokeWidth="2.5" strokeLinecap="round" fill="none"/>
+            <circle cx="20.5" cy="37" r="2.5" fill="white"/>
           </svg>
         </div>
         <div className="text-left">
