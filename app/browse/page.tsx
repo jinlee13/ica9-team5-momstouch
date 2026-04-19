@@ -3,7 +3,8 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { fetchMarketProductsByCat, fetchMarketProductsBySearch, type MarketProduct } from '@/lib/supabase-queries'
+import { fetchMarketProductsByCat, fetchMarketProductsBySearch, fetchClickCounts, type MarketProduct } from '@/lib/supabase-queries'
+import { trackBrowseProductClick } from '@/lib/analytics'
 import { cartStore } from '@/lib/cart'
 import CartBadge from '@/components/CartBadge'
 import { calculateAgeInMonths, getAgeLabel } from '@/lib/recommendations'
@@ -67,6 +68,7 @@ export default function BrowsePage() {
   const [addedIds, setAddedIds] = useState<Set<number>>(new Set())
   const [sortOrder, setSortOrder] = useState<'popular' | 'newest' | 'price_asc' | 'price_desc'>('popular')
   const [sortOpen, setSortOpen] = useState(false)
+  const [clickCounts, setClickCounts] = useState<Record<number, number>>({})
 
   // 검색
   const initialQ = searchParams.get('q') ?? ''
@@ -86,6 +88,12 @@ export default function BrowsePage() {
     })
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  // 상품 로드 시 클릭 수 조회
+  useEffect(() => {
+    if (products.length === 0) return
+    fetchClickCounts(products.map(p => p.id)).then(setClickCounts)
+  }, [products])
 
   // 월령 필터
   const [myAgeMonths, setMyAgeMonths] = useState<number | null>(null)   // 우리 아이 월령
@@ -203,8 +211,14 @@ export default function BrowsePage() {
     if (sortOrder === 'newest') return arr.sort((a, b) => b.id - a.id)
     if (sortOrder === 'price_asc') return arr.sort((a, b) => parsePrice(a.price) - parsePrice(b.price))
     if (sortOrder === 'price_desc') return arr.sort((a, b) => parsePrice(b.price) - parsePrice(a.price))
-    return arr // popular: 이미 review_count desc
-  }, [products, sortOrder])
+    // popular: 클릭 수 기준, 클릭 수 없으면 review_count 기준
+    return arr.sort((a, b) => {
+      const ca = clickCounts[a.id] ?? 0
+      const cb = clickCounts[b.id] ?? 0
+      if (ca !== cb) return cb - ca
+      return (b.review_count ?? 0) - (a.review_count ?? 0)
+    })
+  }, [products, sortOrder, clickCounts])
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -224,10 +238,10 @@ export default function BrowsePage() {
 
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-6">
         {/* 헤더 + 검색바 인라인 */}
-        <div className="flex items-center gap-4 mb-5">
-          <h1 className="text-2xl font-black text-gray-900 whitespace-nowrap">🛍️ 전체 상품</h1>
-          <form onSubmit={handleSearchSubmit}>
-          <div className="relative flex items-center rounded-full border-2 border-purple-300 bg-white shadow-sm hover:border-purple-400 focus-within:border-purple-500 focus-within:shadow-md transition-all w-[380px]">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-5">
+          <h1 className="text-xl sm:text-2xl font-black text-gray-900 whitespace-nowrap">🛍️ 전체 상품</h1>
+          <form onSubmit={handleSearchSubmit} className="flex-1 w-full">
+          <div className="relative flex items-center rounded-full border-2 border-purple-300 bg-white shadow-sm hover:border-purple-400 focus-within:border-purple-500 focus-within:shadow-md transition-all w-full sm:max-w-[420px]">
             <span className="pl-4 text-purple-500 font-black text-base select-none" style={{ color: '#9B7EDE' }}>똑</span>
             <input
               type="text"
@@ -291,7 +305,7 @@ export default function BrowsePage() {
                   const added = addedIds.has(mp.id)
                   return (
                     <div key={mp.id} className="bg-white rounded-2xl border-2 border-gray-100 overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 flex flex-col">
-                      <Link href={`/market/${mp.id}`} className="block aspect-square overflow-hidden bg-gray-50">
+                      <Link href={`/market/${mp.id}`} className="block aspect-square overflow-hidden bg-gray-50" onClick={() => trackBrowseProductClick(mp.id, mp.name, mp.category_main)}>
                         {mp.thumbnail_url ? (
                           <img src={mp.thumbnail_url} alt={mp.name} className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                             onError={(e) => { const el = e.target as HTMLImageElement; el.parentElement!.innerHTML = '<div class="w-full h-full flex items-center justify-center text-4xl">🛍️</div>' }} />
@@ -474,7 +488,7 @@ export default function BrowsePage() {
                 return (
                   <div key={mp.id} className="bg-white rounded-2xl border-2 border-gray-100 overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 flex flex-col">
                     {/* 이미지 */}
-                    <Link href={`/market/${mp.id}`} className="block aspect-square overflow-hidden bg-gray-50">
+                    <Link href={`/market/${mp.id}`} className="block aspect-square overflow-hidden bg-gray-50" onClick={() => trackBrowseProductClick(mp.id, mp.name, mp.category_main)}>
                       {mp.thumbnail_url ? (
                         <img
                           src={mp.thumbnail_url}
