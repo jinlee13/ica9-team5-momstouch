@@ -116,7 +116,7 @@ export default function HomePage() {
     <div className="min-h-screen bg-gray-50">
       {/* GNB */}
       <nav className="border-b border-gray-100 bg-white sticky top-0 z-50 shadow-sm">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <Link href="/" className="text-xl font-bold hover:underline" style={{ color: '#9B7EDE' }}>똑똑한 엄마</Link>
           <div className="flex items-center gap-2 md:gap-4">
             <Link href="/browse"
@@ -131,7 +131,7 @@ export default function HomePage() {
       {/* ChatModal */}
       <ChatModal isOpen={chatOpen} onClose={() => setChatOpen(false)} ageMonths={ageMonths} />
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {/* Page Header */}
         <div className="mb-8">
           <div className="grid md:grid-cols-2 gap-5">
@@ -157,7 +157,7 @@ export default function HomePage() {
                 </form>
               ) : (
                 <div className="flex items-center gap-3 mb-3">
-                  <h1 className="text-3xl font-black">{getAgeLabel(ageMonths)} <span className="text-xl font-normal">이에요</span></h1>
+                  <h1 className="text-2xl sm:text-3xl font-black">{getAgeLabel(ageMonths)} <span className="text-lg sm:text-xl font-normal">이에요</span></h1>
                   <button
                     onClick={() => { setTempBirthdate(birthdate ?? ''); setEditingBirthdate(true) }}
                     className="text-xs px-3 py-1.5 rounded-full bg-white/20 text-white hover:bg-white/30 transition-all font-semibold whitespace-nowrap">
@@ -345,7 +345,7 @@ export default function HomePage() {
       </div>
 
       {/* Browse CTA */}
-      <div className="max-w-7xl mx-auto px-6 mt-10 mb-4">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 mt-10 mb-4">
         <Link href="/browse"
               className="flex items-center justify-between bg-white rounded-2xl p-5 border-2 border-gray-100 hover:border-purple-200 hover:shadow-md transition-all group">
           <div>
@@ -358,7 +358,7 @@ export default function HomePage() {
 
       {/* Footer */}
       <footer className="mt-4 bg-white border-t border-gray-100 py-8">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-3 text-sm text-gray-400">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-center justify-between gap-3 text-sm text-gray-400">
           <Link href="/" className="font-bold text-purple-500">똑똑한 엄마</Link>
           <p>이 정보는 참고용이며 의료적 조언이 아닙니다.</p>
         </div>

@@ -59,6 +59,22 @@ export async function trackMarketClick(
   })
 }
 
+// 전체상품 탐색 페이지 — 상품 카드 클릭
+export async function trackBrowseProductClick(
+  marketProductId: number,
+  marketProductName: string,
+  categoryMain: string | null
+) {
+  await supabase.from('product_events').insert({
+    event_type: 'browse_click',
+    market_product_id: marketProductId,
+    market_product_name: marketProductName,
+    category_main: categoryMain ?? '',
+    session_id: getSessionId(),
+    age_months: getAgeMonths(),
+  })
+}
+
 // 체크리스트 액션
 export async function trackChecklist(
   productId: string,

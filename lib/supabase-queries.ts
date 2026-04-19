@@ -301,6 +301,22 @@ export async function fetchMarketProductsBySearch(
   return data as MarketProduct[]
 }
 
+export async function fetchClickCounts(marketProductIds: number[]): Promise<Record<number, number>> {
+  if (marketProductIds.length === 0) return {}
+  const { data, error } = await supabase
+    .from('product_events')
+    .select('market_product_id')
+    .eq('event_type', 'browse_click')
+    .in('market_product_id', marketProductIds)
+  if (error || !data) return {}
+  const counts: Record<number, number> = {}
+  for (const row of data) {
+    const id = row.market_product_id as number
+    if (id !== null) counts[id] = (counts[id] ?? 0) + 1
+  }
+  return counts
+}
+
 export async function fetchDdokFramework(ageMonths: number) {
   const slug = getAgeGroupForMonths(ageMonths)
   const { data, error } = await supabase

@@ -95,16 +95,16 @@ export default function LandingPage() {
     <div className="min-h-screen bg-white">
       {/* GNB */}
       <nav className="border-b border-gray-100 bg-white/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <span className="text-xl font-bold" style={{ color: '#9B7EDE' }}>똑똑한 엄마</span>
           <div className="flex items-center gap-2">
             <Link href="/browse"
-                  className="text-sm font-semibold px-4 py-2 rounded-full bg-white border-2 border-gray-200 text-gray-700 shadow-sm hover:border-purple-300 hover:text-purple-600 transition-all">
-              🛍️ 전체상품
+                  className="text-sm font-semibold px-3 sm:px-4 py-2 rounded-full bg-white border-2 border-gray-200 text-gray-700 shadow-sm hover:border-purple-300 hover:text-purple-600 transition-all">
+              🛍️ <span className="hidden sm:inline">전체상품</span>
             </Link>
             <Link href="/home"
-                  className="text-sm font-semibold px-4 py-2 rounded-full bg-white border-2 border-gray-200 text-gray-700 shadow-sm hover:border-purple-300 hover:text-purple-600 transition-all">
-              🏠 마이페이지
+                  className="text-sm font-semibold px-3 sm:px-4 py-2 rounded-full bg-white border-2 border-gray-200 text-gray-700 shadow-sm hover:border-purple-300 hover:text-purple-600 transition-all">
+              🏠 <span className="hidden sm:inline">마이페이지</span>
             </Link>
           </div>
         </div>
@@ -113,15 +113,15 @@ export default function LandingPage() {
       {/* Hero */}
       <section className="relative overflow-hidden"
                style={{ background: 'linear-gradient(135deg, rgba(155,126,222,0.06) 0%, rgba(183,148,246,0.08) 50%, rgba(196,181,253,0.12) 100%)' }}>
-        <div className="max-w-7xl mx-auto px-6 py-20 md:py-28">
-          <div className="grid md:grid-cols-2 gap-16 items-center">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-20 md:py-28">
+          <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-center">
             {/* Left */}
             <div className="space-y-7">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold"
                    style={{ backgroundColor: 'rgba(155,126,222,0.12)', color: '#9B7EDE' }}>
                 ✨ WHO·AAP·K-DST 발달 이론 기반
               </div>
-              <h1 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 leading-tight">
                 지금 우리 아이에게<br/>
                 <span style={{ background: 'linear-gradient(to right, #9B7EDE, #B794F6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
                   딱 필요한 것만
@@ -243,10 +243,10 @@ export default function LandingPage() {
       </section>
 
       {/* How it works */}
-      <section id="how" className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-6">
+      <section id="how" className="py-12 sm:py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-14">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">어떻게 사용하나요?</h2>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">어떻게 사용하나요?</h2>
             <p className="text-gray-500 text-lg">30초 안에 우리 아이 맞춤 추천을 받아보세요</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-8">
@@ -267,11 +267,11 @@ export default function LandingPage() {
       </section>
 
       {/* Categories */}
-      <section id="categories" className="py-20"
+      <section id="categories" className="py-12 sm:py-20"
                style={{ background: 'linear-gradient(to bottom right, rgba(155,126,222,0.04), rgba(196,181,253,0.06))' }}>
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-14">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">4가지 카테고리</h2>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">4가지 카테고리</h2>
             <p className="text-gray-500 text-lg">발달 단계별로 필요한 모든 것을 담았어요</p>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
@@ -293,15 +293,15 @@ export default function LandingPage() {
       </section>
 
       {/* DDOK Theory */}
-      <section id="theory" className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-6">
+      <section id="theory" className="py-12 sm:py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="grid md:grid-cols-2 gap-16 items-center">
             <div>
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold mb-6"
                    style={{ backgroundColor: 'rgba(155,126,222,0.12)', color: '#9B7EDE' }}>
                 🧠 DDOK 발달 나침반
               </div>
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-5 leading-tight">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-5 leading-tight">
                 "왜 지금 이게 필요한가?"를<br/>발달 이론으로 설명해요
               </h2>
               <p className="text-gray-500 leading-relaxed mb-8">
@@ -352,10 +352,10 @@ export default function LandingPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20"
+      <section className="py-12 sm:py-20"
                style={{ background: 'linear-gradient(135deg, #9B7EDE 0%, #B794F6 100%)' }}>
-        <div className="max-w-3xl mx-auto px-6 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4">
             지금 우리 아이 개월 수를 입력해보세요
           </h2>
           <p className="text-purple-100 text-lg mb-10">30초 안에 맞춤 추천 목록을 확인할 수 있어요</p>
@@ -380,7 +380,7 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer className="bg-gray-900 text-gray-400 py-10">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-center justify-between gap-4">
           <div>
             <span className="text-white font-bold text-lg">똑똑한 엄마</span>
             <p className="text-xs mt-1">아이 발달 단계에 맞는 육아용품 추천 서비스</p>
